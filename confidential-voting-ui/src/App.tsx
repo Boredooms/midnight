@@ -45,6 +45,10 @@ const App: React.FC = () => {
     scrollToActiveCard();
   };
 
+  const handleRetryConnect = () => {
+    votingManager.retry(CONTRACT_ADDRESS as any);
+  };
+
   const scrollToActiveCard = () => {
     setTimeout(() => {
       const el = document.getElementById('active-elections-container');
@@ -164,13 +168,20 @@ const App: React.FC = () => {
 
         {deployments.map((deployment$, idx) => (
           <Box key={`deployment-${idx}`} data-testid={`voting-card-${idx}`}>
-            <VotingCard votingDeployment$={deployment$} onQuickJoinPreprod={handleJoinContract} />
+            <VotingCard
+              votingDeployment$={deployment$}
+              onQuickJoinPreprod={handleJoinContract}
+              onRetryConnect={handleRetryConnect}
+            />
           </Box>
         ))}
 
         {deployments.length === 0 && (
           <Box data-testid="default-voting-card">
-            <VotingCard onQuickJoinPreprod={handleJoinContract} />
+            <VotingCard
+              onQuickJoinPreprod={handleJoinContract}
+              onRetryConnect={handleRetryConnect}
+            />
           </Box>
         )}
       </Stack>

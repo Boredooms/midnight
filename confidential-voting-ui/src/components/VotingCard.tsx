@@ -29,9 +29,10 @@ import { CONTRACT_ADDRESS } from '../globals';
 export type VotingCardProps = {
   votingDeployment$?: Observable<VotingDeployment>;
   onQuickJoinPreprod?: (contractAddress: string) => void;
+  onRetryConnect?: () => void;
 };
 
-export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$, onQuickJoinPreprod }) => {
+export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$, onQuickJoinPreprod, onRetryConnect }) => {
   const [deployment, setDeployment] = useState<VotingDeployment | undefined>(undefined);
   const [derivedState, setDerivedState] = useState<VotingDerivedState | undefined>(undefined);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -91,7 +92,7 @@ export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$, onQui
       <Card sx={{ bgcolor: '#09090c', color: '#fff', borderRadius: '16px', border: '1px solid #18181b', p: 5, textAlign: 'center' }}>
         <CircularProgress sx={{ color: '#ffffff', mb: 2 }} size={36} thickness={4} />
         <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>Connecting to Midnight Preprod...</Typography>
-        <Typography variant="body2" sx={{ color: '#a1a1aa' }}>Fetching ZK proving keys & subscribing to contract state.</Typography>
+        <Typography variant="body2" sx={{ color: '#a1a1aa' }}>Prompting 1AM Wallet authorization & fetching ZK proving keys.</Typography>
       </Card>
     );
   }
@@ -101,7 +102,8 @@ export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$, onQui
       deployment.error.message.includes('Application is not authorized') ||
       deployment.error.message.includes('wallet') ||
       deployment.error.message.includes('1AM') ||
-      deployment.error.message.includes('Lace');
+      deployment.error.message.includes('Lace') ||
+      deployment.error.message.includes('detected');
 
     return (
       <Card sx={{ bgcolor: '#09090c', color: '#fff', borderRadius: '16px', border: '1px solid #27272a', p: 4 }}>
@@ -115,14 +117,16 @@ export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$, onQui
                 Midnight 1AM Wallet Authorization Required
               </Typography>
               <Typography variant="body2" sx={{ color: '#a1a1aa', mb: 4, maxWidth: 540, mx: 'auto', lineHeight: 1.6 }}>
-                To create elections or submit zero-knowledge votes on <strong>Midnight Preprod</strong>, connect your <strong>1AM Wallet</strong> extension.
+                {deployment.error.message}
               </Typography>
               <Stack direction="row" spacing={2} sx={{ justifyContent: 'center' }}>
                 <Button
                   variant="contained"
                   startIcon={<AccountBalanceWalletIcon />}
                   sx={{ bgcolor: '#ffffff', color: '#000000', fontWeight: 700, px: 3.5, py: 1.4, borderRadius: '12px', '&:hover': { bgcolor: '#e4e4e7' } }}
-                  onClick={() => window.location.reload()}
+                  onClick={() => {
+                    if (onRetryConnect) onRetryConnect();
+                  }}
                 >
                   Connect 1AM Wallet
                 </Button>
@@ -130,9 +134,11 @@ export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$, onQui
                   variant="outlined"
                   startIcon={<RefreshIcon />}
                   sx={{ borderColor: '#27272a', color: '#a1a1aa', borderRadius: '12px', px: 2.5 }}
-                  onClick={() => window.location.reload()}
+                  onClick={() => {
+                    if (onRetryConnect) onRetryConnect();
+                  }}
                 >
-                  Retry
+                  Retry Connection
                 </Button>
               </Stack>
             </Box>

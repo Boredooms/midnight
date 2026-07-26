@@ -31,7 +31,6 @@ import {
 } from 'rxjs';
 import { pipe as fnPipe } from 'fp-ts/function';
 import { type Logger } from 'pino';
-import semver from 'semver';
 import { inMemoryPrivateStateProvider } from '../in-memory-private-state-provider';
 import {
   type Binding,
@@ -62,6 +61,7 @@ export type VotingDeployment =
 export interface DeployedVotingAPIProvider {
   readonly deployments$: Observable<Array<Observable<VotingDeployment>>>;
   readonly resolve: (contractAddress?: ContractAddress) => Observable<VotingDeployment>;
+  readonly retry: (contractAddress?: ContractAddress) => Observable<VotingDeployment>;
 }
 
 export class BrowserDeployedVotingManager implements DeployedVotingAPIProvider {
@@ -74,6 +74,11 @@ export class BrowserDeployedVotingManager implements DeployedVotingAPIProvider {
   }
 
   readonly deployments$: Observable<Array<Observable<VotingDeployment>>>;
+
+  retry(contractAddress?: ContractAddress): Observable<VotingDeployment> {
+    this.#initializedProviders = undefined;
+    return this.resolve(contractAddress);
+  }
 
   resolve(contractAddress?: ContractAddress): Observable<VotingDeployment> {
     const normalizedAddr = contractAddress ? (formatContractAddress(contractAddress) as ContractAddress) : undefined;
@@ -193,10 +198,24 @@ const initializeProviders = async (logger: Logger): Promise<VotingProviders> => 
 };
 
 const getFirstCompatibleWallet = (): InitialAPI | undefined => {
-  if (!window.midnight) return undefined;
-  const wallets = Object.values(window.midnight);
+  if (typeof window === 'undefined' || !window.midnight) return undefined;
+  const midnightObj = window.midnight as Record<string, unknown>;
+
+  // Check known 1AM Wallet / Midnight extension property names
+  if (midnightObj['mn_1am'] && typeof (midnightObj['mn_1am'] as any).connect === 'function') {
+    return midnightObj['mn_1am'] as InitialAPI;
+  }
+  if (midnightObj['1am-wallet'] && typeof (midnightObj['1am-wallet'] as any).connect === 'function') {
+    return midnightObj['1am-wallet'] as InitialAPI;
+  }
+  if (midnightObj['midnight'] && typeof (midnightObj['midnight'] as any).connect === 'function') {
+    return midnightObj['midnight'] as InitialAPI;
+  }
+
+  // Fallback to searching any key in window.midnight
+  const wallets = Object.values(midnightObj);
   for (const wallet of wallets) {
-    if (wallet && typeof wallet === 'object' && 'connect' in wallet && typeof wallet.connect === 'function') {
+    if (wallet && typeof wallet === 'object' && 'connect' in wallet && typeof (wallet as any).connect === 'function') {
       return wallet as InitialAPI;
     }
   }
@@ -213,15 +232,15 @@ const connectToWallet = (logger: Logger, networkId: string): Promise<ConnectedAP
       }),
       filter((connectorAPI): connectorAPI is InitialAPI => !!connectorAPI),
       tap((connectorAPI) => {
-        logger.info(connectorAPI, 'Compatible 1AM Wallet connector API found. Connecting...');
+        logger.info(connectorAPI, 'Compatible 1AM Wallet connector API found. Prompting user authorization...');
       }),
       take(1),
       timeout({
-        first: 5_000,
+        first: 10_000,
         with: () =>
           throwError(() => {
-            logger.error('Could not find 1AM Wallet connector API');
-            return new Error('Could not find Midnight 1AM Wallet. Extension installed and enabled?');
+            logger.error('Could not find 1AM Wallet connector API in window.midnight');
+            return new Error('Midnight 1AM Wallet extension not detected in browser. Is the extension installed & enabled?');
           }),
       }),
       concatMap(async (initialAPI) => {
@@ -230,18 +249,19 @@ const connectToWallet = (logger: Logger, networkId: string): Promise<ConnectedAP
         logger.info(connectionStatus, '1AM Wallet connector API enabled status');
         return connectedAPI;
       }),
+      // Allow up to 120 seconds for user to approve the authorization popup in 1AM Wallet
       timeout({
-        first: 10_000,
+        first: 120_000,
         with: () =>
           throwError(() => {
-            logger.error('1AM Wallet connector API has failed to respond');
-            return new Error('Midnight 1AM Wallet has failed to respond. Is the extension unlocked?');
+            logger.error('1AM Wallet connector API approval timed out');
+            return new Error('1AM Wallet connection approval timed out. Please click "Connect 1AM Wallet" and approve in the extension popup.');
           }),
       }),
       catchError((error, apis) =>
         error
           ? throwError(() => {
-              logger.error('Unable to enable connector API ' + error);
+              logger.error('Unable to enable connector API: ' + error);
               return new Error(error instanceof Error ? error.message : 'Application is not authorized');
             })
           : apis,
