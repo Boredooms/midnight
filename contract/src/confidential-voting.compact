@@ -1,0 +1,59 @@
+// Confidential Voting DApp Contract for Midnight Blockchain
+// Privacy-preserving voting platform built with Compact
+// Rise In Level 1 Builder Challenge
+
+pragma language_version 0.23;
+
+import CompactStandardLibrary;
+
+export enum State {
+  UNINITIALIZED,
+  OPEN,
+  FINALIZED
+}
+
+export ledger state: State;
+export ledger electionTitle: Maybe<Opaque<"string">>;
+export ledger candidate0Tally: Counter;
+export ledger candidate1Tally: Counter;
+export ledger totalVotes: Counter;
+export ledger owner: Bytes<32>;
+export ledger sequence: Counter;
+
+constructor() {
+  state = State.UNINITIALIZED;
+  electionTitle = none<Opaque<"string">>();
+  sequence.increment(1);
+}
+
+witness voterSecretKey(): Bytes<32>;
+
+export circuit createElection(title: Opaque<"string">): [] {
+  assert(state == State.UNINITIALIZED, "Election is already initialized");
+  owner = disclose(voterPublicKey(voterSecretKey(), sequence as Field as Bytes<32>));
+  electionTitle = disclose(some<Opaque<"string">>(title));
+  state = State.OPEN;
+}
+
+export circuit vote(candidateIndex: Field): [] {
+  assert(state == State.OPEN, "Voting is not open for this election");
+  const choice = disclose(candidateIndex);
+  assert(choice == 0 || choice == 1, "Invalid candidate selection");
+  if (choice == 0) {
+    candidate0Tally.increment(1);
+  } else {
+    candidate1Tally.increment(1);
+  }
+  totalVotes.increment(1);
+}
+
+export circuit finalizeElection(): [] {
+  assert(state == State.OPEN, "Voting is not open");
+  assert(owner == voterPublicKey(voterSecretKey(), sequence as Field as Bytes<32>), "Not election owner");
+  state = State.FINALIZED;
+  sequence.increment(1);
+}
+
+export circuit voterPublicKey(sk: Bytes<32>, sequence: Bytes<32>): Bytes<32> {
+  return persistentHash<Vector<3, Bytes<32>>>([pad(32, "voting:pk:"), sequence, sk]);
+}
