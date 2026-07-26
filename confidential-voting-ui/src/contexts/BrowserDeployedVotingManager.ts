@@ -38,10 +38,10 @@ import {
   type FinalizedTransaction,
   type Proof,
   type SignatureEnabled,
-  Transaction,
   type TransactionId,
   type UnboundTransaction,
 } from '@midnight-ntwrk/midnight-js-protocol/compact-js';
+import { Transaction } from '@midnight-ntwrk/midnight-js-protocol/ledger';
 import { fromHex, toHex } from '@midnight-ntwrk/midnight-js-utils';
 
 export type VotingDeployment =

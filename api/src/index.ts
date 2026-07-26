@@ -13,7 +13,9 @@ import {
   CompiledVotingContractContract,
   createVotingPrivateState,
   type VotingPrivateState,
-  * as Voting,
+  pureCircuits,
+  ledger,
+  State,
 } from '@midnight-ntwrk/confidential-voting-contract';
 import {
   deployContract,
@@ -21,7 +23,7 @@ import {
 } from '@midnight-ntwrk/midnight-js-contracts';
 import { combineLatest, from, map, type Observable, tap } from 'rxjs';
 import { toHex } from '@midnight-ntwrk/midnight-js-utils';
-import { convertFieldToBytes } from '@midnight-ntwrk/midnight-js-protocol/compact-js';
+import { convertFieldToBytes } from '@midnight-ntwrk/compact-runtime';
 import * as utils from './utils/index.js';
 
 export const votingPrivateStateKey = 'confidentialVotingPrivateState';
@@ -38,7 +40,7 @@ export class VotingAPI implements DeployedVotingAPI {
     this.state$ = combineLatest(
       [
         providers.publicDataProvider.contractStateObservable(this.deployedContractAddress, { type: 'latest' }).pipe(
-          map((contractState) => Voting.ledger(contractState.data)),
+          map((contractState) => ledger(contractState.data)),
           tap((ledgerState) =>
             logger?.trace({
               ledgerStateChanged: {
@@ -53,7 +55,7 @@ export class VotingAPI implements DeployedVotingAPI {
         from(providers.privateStateProvider.get(votingPrivateStateKey) as Promise<VotingPrivateState>),
       ],
       (ledgerState, privateState) => {
-        const hashedSecretKey = Voting.pureCircuits.voterPublicKey(
+        const hashedSecretKey = pureCircuits.voterPublicKey(
           privateState.secretKey,
           convertFieldToBytes(32, ledgerState.sequence, 'api/src/index.ts'),
         );

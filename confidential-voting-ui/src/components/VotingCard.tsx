@@ -13,7 +13,7 @@ import {
   Divider,
 } from '@mui/material';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import LockIcon from '@mui/icons-material/Lock';
 import SecurityIcon from '@mui/icons-material/Security';
 import { type Observable } from 'rxjs';
@@ -140,7 +140,7 @@ export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$ }) => 
           </Stack>
           {isUninit && <Chip label="Uninitialized" color="warning" size="small" />}
           {isOpen && <Chip label="Voting Open" color="success" size="small" icon={<HowToVoteIcon />} />}
-          {isFinalized && <Chip label="Finalized" color="default" size="small" icon={<CheckCircleOutlineIcon />} />}
+          {isFinalized && <Chip label="Finalized" color="default" size="small" icon={<CheckCircleIcon />} />}
         </Stack>
 
         <Typography variant="h4" sx={{ fontWeight: 700, mb: 1, color: '#fff' }}>
@@ -165,7 +165,7 @@ export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$ }) => 
         {isSubmitting && <LinearProgress sx={{ mb: 2, borderRadius: 1 }} />}
 
         {isUninit && (
-          <Box sx={{ bgcolor: '#1a1a24', p: 3, borderRadius: 2, border: '1px border #333' }}>
+          <Box sx={{ bgcolor: '#1a1a24', p: 3, borderRadius: 2, border: '1px solid #333' }}>
             <Typography variant="h6" sx={{ mb: 1 }}>Initialize Election</Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
               Set an election topic and generate ZK ownership commitment.

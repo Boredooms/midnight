@@ -5,6 +5,14 @@
 
 ---
 
+## 📸 Application Preview
+
+![Confidential Voting DApp Dashboard](file:///C:/Users/devar/.gemini/antigravity-ide/brain/5298cde7-fa49-4dd0-9c25-92865c96528c/confidential_voting_dashboard_1785089546726.png)
+
+*Figure 1: Confidential Voting DApp Web Application rendering Zero-Knowledge feature cards, Midnight Lace Wallet connector, and active election interface.*
+
+---
+
 ## 📌 Project Overview
 
 The **Confidential Voting DApp** allows organizations and communities to conduct tamper-proof, transparent elections while protecting individual voter privacy. By leveraging Midnight's Zero-Knowledge (ZK) execution environment, voters can cast ballots confidentially without exposing their choices or identity, while anyone can publicly verify that the election outcome is 100% accurate.
@@ -68,6 +76,8 @@ confidential-voting/
 │   ├── src/components/             # VotingCard, Header, MainLayout components
 │   ├── src/contexts/               # BrowserDeployedVotingManager & React Context
 │   └── src/globals.ts              # Contract address & polyfills
+├── docs/screenshots/               # Application UI Screenshots
+│   └── dashboard.png               # Rendered DApp UI Preview
 ├── package.json                    # Workspace configuration
 └── README.md                       # Project documentation
 ```
@@ -166,14 +176,6 @@ This repository maintains clean commit history without scaffold remnants. All re
 git status
 git log --oneline
 ```
-
----
-
-## 💡 Future Improvements
-
-1. **Multi-Candidate Expansion**: Support dynamic list of N candidates per election.
-2. **Encrypted Ballot Auditing**: Allow voters to verify their ballot was counted using an encrypted receipt.
-3. **Time-based Automatic Finalization**: Automatically close elections based on block height or block timestamp.
 
 ---
 
