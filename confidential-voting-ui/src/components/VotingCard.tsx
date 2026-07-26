@@ -131,8 +131,8 @@ export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$ }) => 
   return (
     <Card sx={{ bgcolor: '#121218', color: '#fff', borderRadius: 3, border: '1px solid #272738', boxShadow: '0 8px 32px rgba(0,0,0,0.6)', p: 1 }}>
       <CardContent sx={{ p: 3 }}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-          <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
             <LockIcon sx={{ color: '#00f2fe' }} />
             <Typography variant="subtitle2" sx={{ color: '#00f2fe', fontWeight: 600, letterSpacing: 1 }}>
               PRIVACY-PRESERVING ZERO-KNOWLEDGE ELECTION
@@ -186,7 +186,7 @@ export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$ }) => 
             <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>Election Results & Tally</Typography>
 
             <Box sx={{ mb: 3 }}>
-              <Stack direction="row" justifyContent="space-between" sx={{ mb: 1 }}>
+              <Stack direction="row" sx={{ justifyContent: 'space-between', mb: 1 }}>
                 <Typography variant="body1" sx={{ fontWeight: 600 }}>Candidate 0 (Option A)</Typography>
                 <Typography variant="body1" sx={{ color: '#00f2fe', fontWeight: 700 }}>{cand0} votes ({percent0}%)</Typography>
               </Stack>
@@ -194,7 +194,7 @@ export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$ }) => 
             </Box>
 
             <Box sx={{ mb: 3 }}>
-              <Stack direction="row" justifyContent="space-between" sx={{ mb: 1 }}>
+              <Stack direction="row" sx={{ justifyContent: 'space-between', mb: 1 }}>
                 <Typography variant="body1" sx={{ fontWeight: 600 }}>Candidate 1 (Option B)</Typography>
                 <Typography variant="body1" sx={{ color: '#ff4081', fontWeight: 700 }}>{cand1} votes ({percent1}%)</Typography>
               </Stack>
@@ -203,7 +203,7 @@ export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$ }) => 
 
             <Divider sx={{ my: 2, borderColor: '#222' }} />
 
-            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+            <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
               <Typography variant="body2" sx={{ color: '#90a0b7' }}>Total Confidential Votes Verified: <strong>{total}</strong></Typography>
               {derivedState?.isOwner && <Chip label="Election Owner" color="primary" size="small" variant="outlined" />}
             </Stack>
