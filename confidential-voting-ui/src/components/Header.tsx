@@ -68,7 +68,7 @@ export const Header: React.FC<HeaderProps> = ({ onJoinContract, onDeployContract
           )}
 
           <Button startIcon={<AccountBalanceWalletIcon />} variant="contained" color="secondary" sx={{ borderRadius: 2, fontWeight: 600 }}>
-            Lace Wallet
+            1AM Wallet
           </Button>
         </Stack>
       </Toolbar>

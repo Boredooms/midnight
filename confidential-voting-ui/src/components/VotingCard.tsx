@@ -16,6 +16,8 @@ import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import LockIcon from '@mui/icons-material/Lock';
 import SecurityIcon from '@mui/icons-material/Security';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import { type Observable } from 'rxjs';
 import { type VotingDeployment } from '../contexts';
 import { type VotingDerivedState } from '@midnight-ntwrk/confidential-voting-api';
@@ -67,11 +69,49 @@ export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$ }) => 
   }
 
   if (deployment.status === 'failed') {
+    const isAuthOrWalletError =
+      deployment.error.message.includes('Application is not authorized') ||
+      deployment.error.message.includes('wallet') ||
+      deployment.error.message.includes('1AM') ||
+      deployment.error.message.includes('Lace');
+
     return (
-      <Card sx={{ bgcolor: '#121218', color: '#fff', borderRadius: 3, border: '1px solid #f44336', p: 3 }}>
-        <Alert severity="error">
-          Failed to load election contract: {deployment.error.message}
-        </Alert>
+      <Card sx={{ bgcolor: '#121218', color: '#fff', borderRadius: 3, border: '1px solid #332a24', p: 3 }}>
+        <CardContent>
+          {isAuthOrWalletError ? (
+            <Box sx={{ textAlign: 'center', py: 2 }}>
+              <AccountBalanceWalletIcon sx={{ fontSize: 52, color: '#00f2fe', mb: 1 }} />
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: '#fff' }}>
+                Midnight 1AM Wallet Connection Required
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#90a0b7', mb: 3, maxWidth: 520, mx: 'auto' }}>
+                To interact with this confidential voting contract on <strong>Midnight Preprod</strong>, please authorize the connection in your <strong>1AM Wallet</strong> extension.
+              </Typography>
+              <Stack direction="row" spacing={2} sx={{ justifyContent: 'center' }}>
+                <Button
+                  variant="contained"
+                  startIcon={<AccountBalanceWalletIcon />}
+                  sx={{ background: 'linear-gradient(90deg, #00f2fe 0%, #4facfe 100%)', color: '#000', fontWeight: 700, px: 3, py: 1.2 }}
+                  onClick={() => window.location.reload()}
+                >
+                  Connect & Authorize 1AM Wallet
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<RefreshIcon />}
+                  sx={{ color: '#90a0b7', borderColor: '#333' }}
+                  onClick={() => window.location.reload()}
+                >
+                  Retry Connection
+                </Button>
+              </Stack>
+            </Box>
+          ) : (
+            <Alert severity="error" sx={{ bgcolor: '#241416', color: '#ff8a80' }}>
+              Failed to load election contract: {deployment.error.message}
+            </Alert>
+          )}
+        </CardContent>
       </Card>
     );
   }

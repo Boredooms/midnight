@@ -1,9 +1,8 @@
 import {
-  type ContractAddress,
   type InitialAPI,
   type ConnectedAPI,
-  type NetworkId,
 } from '@midnight-ntwrk/dapp-connector-api';
+import { type ContractAddress } from '@midnight-ntwrk/compact-runtime';
 import {
   type VotingCircuitKeys,
   type VotingDerivedState,
@@ -40,9 +39,11 @@ import {
   type SignatureEnabled,
   type TransactionId,
   type UnboundTransaction,
-} from '@midnight-ntwrk/midnight-js-protocol/compact-js';
-import { Transaction } from '@midnight-ntwrk/midnight-js-protocol/ledger';
+  Transaction,
+} from '@midnight-ntwrk/midnight-js-protocol/ledger';
 import { fromHex, toHex } from '@midnight-ntwrk/midnight-js-utils';
+
+type NetworkId = string;
 
 export type VotingDeployment =
   | {
@@ -195,12 +196,11 @@ const getFirstCompatibleWallet = (): InitialAPI | undefined => {
     (wallet): wallet is InitialAPI =>
       !!wallet &&
       typeof wallet === 'object' &&
-      'apiVersion' in wallet &&
-      semver.satisfies(wallet.apiVersion, COMPATIBLE_CONNECTOR_API_VERSION),
+      ('apiVersion' in wallet ? semver.satisfies(wallet.apiVersion, COMPATIBLE_CONNECTOR_API_VERSION) : true),
   );
 };
 
-const COMPATIBLE_CONNECTOR_API_VERSION = '4.x';
+const COMPATIBLE_CONNECTOR_API_VERSION = '>=1.0.0';
 
 const connectToWallet = (logger: Logger, networkId: string): Promise<ConnectedAPI> => {
   return firstValueFrom(
@@ -220,7 +220,7 @@ const connectToWallet = (logger: Logger, networkId: string): Promise<ConnectedAP
         with: () =>
           throwError(() => {
             logger.error('Could not find wallet connector API');
-            return new Error('Could not find Midnight Lace wallet. Extension installed?');
+            return new Error('Could not find Midnight 1AM Wallet. Extension installed?');
           }),
       }),
       concatMap(async (initialAPI) => {
@@ -234,7 +234,7 @@ const connectToWallet = (logger: Logger, networkId: string): Promise<ConnectedAP
         with: () =>
           throwError(() => {
             logger.error('Wallet connector API has failed to respond');
-            return new Error('Midnight Lace wallet has failed to respond. Extension enabled?');
+            return new Error('Midnight 1AM Wallet has failed to respond. Extension enabled?');
           }),
       }),
       catchError((error, apis) =>
