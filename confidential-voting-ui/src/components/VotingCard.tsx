@@ -18,6 +18,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import SecurityIcon from '@mui/icons-material/Security';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { type Observable } from 'rxjs';
 import { type VotingDeployment } from '../contexts';
 import { type VotingDerivedState } from '@midnight-ntwrk/confidential-voting-api';
@@ -33,6 +34,7 @@ export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$ }) => 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [actionMessage, setActionMessage] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string>('');
+  const [copied, setCopied] = useState<boolean>(false);
 
   useEffect(() => {
     if (!votingDeployment$) return;
@@ -46,12 +48,20 @@ export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$ }) => 
     return () => sub.unsubscribe();
   }, [votingDeployment$]);
 
+  const copyAddress = () => {
+    if (deployment?.status === 'deployed') {
+      navigator.clipboard.writeText(deployment.api.deployedContractAddress);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
   if (!deployment) {
     return (
-      <Card sx={{ bgcolor: '#121218', color: '#fff', borderRadius: 3, border: '1px solid #2d2d3a', p: 2 }}>
-        <CardContent sx={{ textAlign: 'center' }}>
-          <Typography variant="h6" color="text.secondary">
-            No election joined yet. Join or deploy an election to get started.
+      <Card sx={{ bgcolor: '#09090c', color: '#fff', borderRadius: '16px', border: '1px solid #18181b', p: 3, textAlign: 'center' }}>
+        <CardContent sx={{ py: 3 }}>
+          <Typography variant="body1" sx={{ color: '#a1a1aa', fontWeight: 500 }}>
+            No election joined yet. Use <strong>Deploy Election</strong> above or enter a 32-byte Contract Address to inspect on-chain state.
           </Typography>
         </CardContent>
       </Card>
@@ -60,10 +70,10 @@ export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$ }) => 
 
   if (deployment.status === 'in-progress') {
     return (
-      <Card sx={{ bgcolor: '#121218', color: '#fff', borderRadius: 3, border: '1px solid #2d2d3a', p: 4, textAlign: 'center' }}>
-        <CircularProgress color="primary" sx={{ mb: 2 }} />
-        <Typography variant="h6">Connecting to Midnight Preprod & Generating ZK Proofs...</Typography>
-        <Typography variant="body2" color="text.secondary">Please stand by while smart contract transactions finalize.</Typography>
+      <Card sx={{ bgcolor: '#09090c', color: '#fff', borderRadius: '16px', border: '1px solid #18181b', p: 5, textAlign: 'center' }}>
+        <CircularProgress sx={{ color: '#ffffff', mb: 2 }} size={36} thickness={4} />
+        <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>Connecting to Midnight Preprod...</Typography>
+        <Typography variant="body2" sx={{ color: '#a1a1aa' }}>Generating ZK proof key parameters & querying on-chain state.</Typography>
       </Card>
     );
   }
@@ -76,38 +86,40 @@ export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$ }) => 
       deployment.error.message.includes('Lace');
 
     return (
-      <Card sx={{ bgcolor: '#121218', color: '#fff', borderRadius: 3, border: '1px solid #332a24', p: 3 }}>
+      <Card sx={{ bgcolor: '#09090c', color: '#fff', borderRadius: '16px', border: '1px solid #27272a', p: 4 }}>
         <CardContent>
           {isAuthOrWalletError ? (
             <Box sx={{ textAlign: 'center', py: 2 }}>
-              <AccountBalanceWalletIcon sx={{ fontSize: 52, color: '#00f2fe', mb: 1 }} />
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: '#fff' }}>
-                Midnight 1AM Wallet Connection Required
+              <Box sx={{ display: 'inline-flex', p: 2, bgcolor: '#ffffff0a', borderRadius: '50%', mb: 2, border: '1px solid #ffffff15' }}>
+                <AccountBalanceWalletIcon sx={{ fontSize: 44, color: '#ffffff' }} />
+              </Box>
+              <Typography variant="h5" sx={{ fontWeight: 800, mb: 1, color: '#ffffff', letterSpacing: '-0.02em' }}>
+                Midnight 1AM Wallet Authorization Required
               </Typography>
-              <Typography variant="body2" sx={{ color: '#90a0b7', mb: 3, maxWidth: 520, mx: 'auto' }}>
-                To interact with this confidential voting contract on <strong>Midnight Preprod</strong>, please authorize the connection in your <strong>1AM Wallet</strong> extension.
+              <Typography variant="body2" sx={{ color: '#a1a1aa', mb: 4, maxWidth: 540, mx: 'auto', lineHeight: 1.6 }}>
+                To create elections or submit zero-knowledge votes on <strong>Midnight Preprod</strong>, connect your <strong>1AM Wallet</strong> extension.
               </Typography>
               <Stack direction="row" spacing={2} sx={{ justifyContent: 'center' }}>
                 <Button
                   variant="contained"
                   startIcon={<AccountBalanceWalletIcon />}
-                  sx={{ background: 'linear-gradient(90deg, #00f2fe 0%, #4facfe 100%)', color: '#000', fontWeight: 700, px: 3, py: 1.2 }}
+                  sx={{ bgcolor: '#ffffff', color: '#000000', fontWeight: 700, px: 3.5, py: 1.4, borderRadius: '12px', '&:hover': { bgcolor: '#e4e4e7' } }}
                   onClick={() => window.location.reload()}
                 >
-                  Connect & Authorize 1AM Wallet
+                  Connect 1AM Wallet
                 </Button>
                 <Button
                   variant="outlined"
                   startIcon={<RefreshIcon />}
-                  sx={{ color: '#90a0b7', borderColor: '#333' }}
+                  sx={{ borderColor: '#27272a', color: '#a1a1aa', borderRadius: '12px', px: 2.5 }}
                   onClick={() => window.location.reload()}
                 >
-                  Retry Connection
+                  Retry
                 </Button>
               </Stack>
             </Box>
           ) : (
-            <Alert severity="error" sx={{ bgcolor: '#241416', color: '#ff8a80' }}>
+            <Alert severity="error" sx={{ bgcolor: '#180e0e', color: '#f87171', border: '1px solid #3b1212', borderRadius: '12px' }}>
               Failed to load election contract: {deployment.error.message}
             </Alert>
           )}
@@ -120,7 +132,7 @@ export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$ }) => 
     try {
       setIsSubmitting(true);
       setErrorMsg('');
-      setActionMessage(`Generating ZK proof & casting confidential vote for Candidate ${candidateIndex}...`);
+      setActionMessage(`Generating Zero-Knowledge proof & casting confidential vote for Candidate ${candidateIndex}...`);
       await deployment.api.vote(candidateIndex);
       setActionMessage('Vote successfully cast and proven on Midnight!');
     } catch (err: any) {
@@ -169,50 +181,56 @@ export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$ }) => 
   const isFinalized = derivedState?.state === State.FINALIZED;
 
   return (
-    <Card sx={{ bgcolor: '#121218', color: '#fff', borderRadius: 3, border: '1px solid #272738', boxShadow: '0 8px 32px rgba(0,0,0,0.6)', p: 1 }}>
-      <CardContent sx={{ p: 3 }}>
-        <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+    <Card sx={{ bgcolor: '#09090c', color: '#fff', borderRadius: '16px', border: '1px solid #18181b', boxShadow: '0 8px 32px rgba(0,0,0,0.8)', p: 1 }}>
+      <CardContent sx={{ p: 3.5 }}>
+        <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 2.5 }}>
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-            <LockIcon sx={{ color: '#00f2fe' }} />
-            <Typography variant="subtitle2" sx={{ color: '#00f2fe', fontWeight: 600, letterSpacing: 1 }}>
-              PRIVACY-PRESERVING ZERO-KNOWLEDGE ELECTION
+            <LockIcon sx={{ color: '#ffffff', fontSize: 18 }} />
+            <Typography variant="caption" sx={{ color: '#a1a1aa', fontWeight: 700, letterSpacing: '0.1em' }}>
+              ZERO-KNOWLEDGE CONFIDENTIAL ELECTION
             </Typography>
           </Stack>
-          {isUninit && <Chip label="Uninitialized" color="warning" size="small" />}
-          {isOpen && <Chip label="Voting Open" color="success" size="small" icon={<HowToVoteIcon />} />}
-          {isFinalized && <Chip label="Finalized" color="default" size="small" icon={<CheckCircleIcon />} />}
+          {isUninit && <Chip label="UNINITIALIZED" size="small" sx={{ bgcolor: '#27272a', color: '#e4e4e7', fontWeight: 700, fontSize: '0.7rem' }} />}
+          {isOpen && <Chip label="VOTING OPEN" size="small" sx={{ bgcolor: '#ffffff', color: '#000000', fontWeight: 800, fontSize: '0.7rem' }} icon={<HowToVoteIcon sx={{ color: '#000 !important' }} />} />}
+          {isFinalized && <Chip label="FINALIZED" size="small" sx={{ bgcolor: '#18181b', color: '#71717a', border: '1px solid #27272a', fontWeight: 700, fontSize: '0.7rem' }} icon={<CheckCircleIcon />} />}
         </Stack>
 
-        <Typography variant="h4" sx={{ fontWeight: 700, mb: 1, color: '#fff' }}>
+        <Typography variant="h4" sx={{ fontWeight: 800, mb: 1, color: '#ffffff', letterSpacing: '-0.03em' }}>
           {derivedState?.electionTitle ?? 'Confidential Election'}
         </Typography>
-        <Typography variant="body2" sx={{ color: '#90a0b7', mb: 3 }}>
-          Contract Address: <span style={{ fontFamily: 'monospace', color: '#00f2fe' }}>{deployment.api.deployedContractAddress}</span>
-        </Typography>
+
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 3 }}>
+          <Typography variant="caption" sx={{ color: '#71717a', fontFamily: 'monospace' }}>
+            Contract Address: <span style={{ color: '#ffffff' }}>{deployment.api.deployedContractAddress}</span>
+          </Typography>
+          <Button size="small" startIcon={<ContentCopyIcon sx={{ fontSize: 14 }} />} sx={{ color: '#a1a1aa', py: 0.2, minWidth: 0 }} onClick={copyAddress}>
+            {copied ? 'Copied!' : 'Copy'}
+          </Button>
+        </Stack>
 
         {errorMsg && (
-          <Alert severity="error" sx={{ mb: 2 }} onClose={() => setErrorMsg('')}>
+          <Alert severity="error" sx={{ mb: 2.5, bgcolor: '#180e0e', color: '#f87171', border: '1px solid #3b1212', borderRadius: '10px' }} onClose={() => setErrorMsg('')}>
             {errorMsg}
           </Alert>
         )}
 
         {actionMessage && !errorMsg && (
-          <Alert severity="info" sx={{ mb: 2 }}>
+          <Alert severity="info" sx={{ mb: 2.5, bgcolor: '#0e1726', color: '#60a5fa', border: '1px solid #1e3a5f', borderRadius: '10px' }}>
             {actionMessage}
           </Alert>
         )}
 
-        {isSubmitting && <LinearProgress sx={{ mb: 2, borderRadius: 1 }} />}
+        {isSubmitting && <LinearProgress sx={{ mb: 2.5, borderRadius: 1, bgcolor: '#18181b', '& .MuiLinearProgress-bar': { bgcolor: '#ffffff' } }} />}
 
         {isUninit && (
-          <Box sx={{ bgcolor: '#1a1a24', p: 3, borderRadius: 2, border: '1px solid #333' }}>
-            <Typography variant="h6" sx={{ mb: 1 }}>Initialize Election</Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Set an election topic and generate ZK ownership commitment.
+          <Box sx={{ bgcolor: '#121216', p: 3.5, borderRadius: '12px', border: '1px solid #27272a' }}>
+            <Typography variant="h6" sx={{ mb: 1, fontWeight: 700 }}>Initialize Election State</Typography>
+            <Typography variant="body2" sx={{ color: '#a1a1aa', mb: 3 }}>
+              Open voting round with a topic commitment proven on the Midnight Preprod chain.
             </Typography>
             <Button
               variant="contained"
-              sx={{ background: 'linear-gradient(90deg, #00f2fe 0%, #4facfe 100%)', color: '#000', fontWeight: 700 }}
+              sx={{ bgcolor: '#ffffff', color: '#000000', fontWeight: 800, px: 3, py: 1.2 }}
               onClick={() => handleCreateElection('Level 1 Builder Challenge Voting')}
               disabled={isSubmitting}
             >
@@ -223,29 +241,29 @@ export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$ }) => 
 
         {(isOpen || isFinalized) && (
           <Box sx={{ mt: 2 }}>
-            <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>Election Results & Tally</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 2.5 }}>Election Tally & Progress</Typography>
 
-            <Box sx={{ mb: 3 }}>
-              <Stack direction="row" sx={{ justifyContent: 'space-between', mb: 1 }}>
-                <Typography variant="body1" sx={{ fontWeight: 600 }}>Candidate 0 (Option A)</Typography>
-                <Typography variant="body1" sx={{ color: '#00f2fe', fontWeight: 700 }}>{cand0} votes ({percent0}%)</Typography>
+            <Box sx={{ mb: 3, p: 2.5, bgcolor: '#121216', borderRadius: '12px', border: '1px solid #18181b' }}>
+              <Stack direction="row" sx={{ justifyContent: 'space-between', mb: 1.5 }}>
+                <Typography variant="body1" sx={{ fontWeight: 700 }}>Candidate 0 (Option A)</Typography>
+                <Typography variant="body1" sx={{ color: '#ffffff', fontWeight: 800 }}>{cand0} votes ({percent0}%)</Typography>
               </Stack>
-              <LinearProgress variant="determinate" value={percent0} sx={{ height: 12, borderRadius: 6, bgcolor: '#222', '& .MuiLinearProgress-bar': { background: 'linear-gradient(90deg, #00f2fe, #4facfe)' } }} />
+              <LinearProgress variant="determinate" value={percent0} sx={{ height: 10, borderRadius: 5, bgcolor: '#18181b', '& .MuiLinearProgress-bar': { bgcolor: '#ffffff' } }} />
             </Box>
 
-            <Box sx={{ mb: 3 }}>
-              <Stack direction="row" sx={{ justifyContent: 'space-between', mb: 1 }}>
-                <Typography variant="body1" sx={{ fontWeight: 600 }}>Candidate 1 (Option B)</Typography>
-                <Typography variant="body1" sx={{ color: '#ff4081', fontWeight: 700 }}>{cand1} votes ({percent1}%)</Typography>
+            <Box sx={{ mb: 3, p: 2.5, bgcolor: '#121216', borderRadius: '12px', border: '1px solid #18181b' }}>
+              <Stack direction="row" sx={{ justifyContent: 'space-between', mb: 1.5 }}>
+                <Typography variant="body1" sx={{ fontWeight: 700 }}>Candidate 1 (Option B)</Typography>
+                <Typography variant="body1" sx={{ color: '#a1a1aa', fontWeight: 800 }}>{cand1} votes ({percent1}%)</Typography>
               </Stack>
-              <LinearProgress variant="determinate" value={percent1} sx={{ height: 12, borderRadius: 6, bgcolor: '#222', '& .MuiLinearProgress-bar': { background: 'linear-gradient(90deg, #ff4081, #ff80ab)' } }} />
+              <LinearProgress variant="determinate" value={percent1} sx={{ height: 10, borderRadius: 5, bgcolor: '#18181b', '& .MuiLinearProgress-bar': { bgcolor: '#71717a' } }} />
             </Box>
 
-            <Divider sx={{ my: 2, borderColor: '#222' }} />
+            <Divider sx={{ my: 2.5, borderColor: '#18181b' }} />
 
             <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-              <Typography variant="body2" sx={{ color: '#90a0b7' }}>Total Confidential Votes Verified: <strong>{total}</strong></Typography>
-              {derivedState?.isOwner && <Chip label="Election Owner" color="primary" size="small" variant="outlined" />}
+              <Typography variant="body2" sx={{ color: '#a1a1aa' }}>Total Zero-Knowledge Votes Proven: <strong style={{ color: '#ffffff' }}>{total}</strong></Typography>
+              {derivedState?.isOwner && <Chip label="ELECTION CREATOR" size="small" sx={{ bgcolor: '#ffffff15', color: '#ffffff', border: '1px solid #ffffff30', fontWeight: 700, fontSize: '0.65rem' }} />}
             </Stack>
 
             {isOpen && (
@@ -255,22 +273,22 @@ export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$ }) => 
                   variant="contained"
                   size="large"
                   startIcon={<SecurityIcon />}
-                  sx={{ background: 'linear-gradient(90deg, #00f2fe 0%, #4facfe 100%)', color: '#000', fontWeight: 700, py: 1.5 }}
+                  sx={{ bgcolor: '#ffffff', color: '#000000', fontWeight: 800, py: 1.6, '&:hover': { bgcolor: '#e4e4e7' } }}
                   onClick={() => handleVote(0)}
                   disabled={isSubmitting}
                 >
-                  Vote Candidate 0 Privately
+                  Vote Candidate 0 (ZK Private)
                 </Button>
                 <Button
                   fullWidth
-                  variant="contained"
+                  variant="outlined"
                   size="large"
                   startIcon={<SecurityIcon />}
-                  sx={{ background: 'linear-gradient(90deg, #ff4081 0%, #ff80ab 100%)', color: '#fff', fontWeight: 700, py: 1.5 }}
+                  sx={{ borderColor: '#3f3f46', color: '#ffffff', fontWeight: 700, py: 1.6, '&:hover': { borderColor: '#ffffff', bgcolor: '#ffffff0a' } }}
                   onClick={() => handleVote(1)}
                   disabled={isSubmitting}
                 >
-                  Vote Candidate 1 Privately
+                  Vote Candidate 1 (ZK Private)
                 </Button>
               </Stack>
             )}
@@ -280,11 +298,11 @@ export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$ }) => 
                 variant="outlined"
                 color="warning"
                 fullWidth
-                sx={{ mt: 1 }}
+                sx={{ mt: 1, borderColor: '#3f3f46', color: '#e4e4e7' }}
                 onClick={handleFinalize}
                 disabled={isSubmitting}
               >
-                Finalize Election (Owner Only)
+                Finalize Election (Creator Only)
               </Button>
             )}
           </Box>

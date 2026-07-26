@@ -1,32 +1,32 @@
 # Confidential Voting DApp — Midnight Blockchain
 
 > **Rise In Level 1 Builder Challenge Submission**
-> A privacy-preserving decentralized voting platform built on Midnight using Compact smart contracts and Zero-Knowledge proofs.
+> A privacy-preserving decentralized voting platform built on Midnight using Compact smart contracts, 1AM Wallet integration, and Zero-Knowledge proofs.
 
 ---
 
-## 📸 Application Preview
+## 📸 High-Craft Monochrome DApp Preview
 
-![Confidential Voting DApp Dashboard](file:///C:/Users/devar/.gemini/antigravity-ide/brain/5298cde7-fa49-4dd0-9c25-92865c96528c/confidential_voting_dashboard_1785089546726.png)
+![Confidential Voting DApp Dashboard](file:///C:/Users/devar/.gemini/antigravity-ide/brain/5298cde7-fa49-4dd0-9c25-92865c96528c/full_page_ui_1785093718595.png)
 
-*Figure 1: Confidential Voting DApp Web Application rendering Zero-Knowledge feature cards, Midnight Lace Wallet connector, and active election interface.*
+*Figure 1: Full-page view of the high-craft monochrome Confidential Voting DApp featuring 1AM Wallet integration, Zero-Knowledge architecture cards, active election tallies, and interactive deployment documentation.*
 
 ---
 
 ## 📌 Project Overview
 
-The **Confidential Voting DApp** allows organizations and communities to conduct tamper-proof, transparent elections while protecting individual voter privacy. By leveraging Midnight's Zero-Knowledge (ZK) execution environment, voters can cast ballots confidentially without exposing their choices or identity, while anyone can publicly verify that the election outcome is 100% accurate.
+The **Confidential Voting DApp** enables organizations and communities to conduct tamper-proof, transparent elections while protecting voter privacy. By leveraging Midnight's Zero-Knowledge (ZK) execution environment, voters cast ballots confidentially without exposing their choices or identity, while anyone can publicly verify that the election outcome is 100% accurate.
 
 ---
 
-## ✨ Features
+## ✨ Key Features & Architecture
 
 - 🔒 **Zero-Knowledge Privacy**: Individual votes and voter secret keys remain strictly private off-chain via Compact ZK circuits.
 - 🗳️ **Verifiable Public Tally**: Public ledger state tracks candidate tallies and total vote counts transparently.
 - 🛡️ **Double-Voting Prevention**: Unique ZK private state nullifier commitments prevent double voting.
 - 🔑 **Election Creator Privileges**: Election creators can open new elections and finalize voting rounds.
-- 👛 **Midnight Lace Wallet Connector**: Native integration with Midnight Lace Wallet (`window.midnight`) for transaction balancing, signing, and submission.
-- 💻 **Interactive CLI & Web UI**: Complete command-line interface and responsive React web dashboard.
+- 👛 **Midnight 1AM Wallet Connector**: Native integration with 1AM Wallet (`window.midnight`) for transaction balancing, signing, and submission on Midnight Preprod.
+- 🎨 **Ultra-Monochrome Design**: Modern OLED black aesthetic (`#000000` / `#09090c`), subtle glassmorphic elements, smooth scrolling, and hover elevations.
 
 ---
 
@@ -54,9 +54,7 @@ The **Confidential Voting DApp** allows organizations and communities to conduct
 
 ---
 
-## 🏗️ Architecture & Workspace Structure
-
-The project is structured as a yarn monorepo workspace:
+## 🏗️ Monorepo Workspace Structure
 
 ```
 confidential-voting/
@@ -75,29 +73,11 @@ confidential-voting/
 │   ├── src/App.tsx                 # Main Application dashboard
 │   ├── src/components/             # VotingCard, Header, MainLayout components
 │   ├── src/contexts/               # BrowserDeployedVotingManager & React Context
-│   └── src/globals.ts              # Contract address & polyfills
+│   └── src/globals.ts              # Contract address & 32-byte normalization
 ├── docs/screenshots/               # Application UI Screenshots
-│   └── dashboard.png               # Rendered DApp UI Preview
+│   └── monochrome_dashboard.png    # Rendered DApp UI Preview
 ├── package.json                    # Workspace configuration
 └── README.md                       # Project documentation
-```
-
----
-
-## ⚙️ Installation & Prerequisites
-
-- **Node.js**: `v24.x`
-- **Yarn**: `v1.22.x`
-- **Compact Compiler**: `v0.31.x`
-- **Docker**: For running Midnight proof-server locally
-
-```bash
-# Clone the repository
-git clone <repository-url>
-cd confidential-voting
-
-# Install all workspace dependencies
-yarn
 ```
 
 ---
@@ -136,7 +116,7 @@ cd confidential-voting-ui
 yarn dev
 ```
 
-Navigate to `http://localhost:5173` in your browser with the **Midnight Lace Wallet** extension installed.
+Navigate to `http://localhost:5173` in your browser with the **Midnight 1AM Wallet** extension installed.
 
 ---
 
@@ -144,37 +124,10 @@ Navigate to `http://localhost:5173` in your browser with the **Midnight Lace Wal
 
 ```text
 Network:
-Preprod
+Preprod Testnet
 
-Contract Address:
-0200dbf964f541e1950883f5b2f539b66fd6111e46ce8e6e9551fbdd180114d5dd5b
-```
-
-### Development & Testnet Wallet
-
-```text
-Preprod Development Wallet:
-mn_addr_preprod1xn8uwf8hplkuws6n53av7n8msevlus7x5au3re8ral9sx0pd82csqv39gh
-```
-
----
-
-## 🔧 Environment Variables
-
-| Variable | Description | Default |
-| :--- | :--- | :--- |
-| `VITE_NETWORK_ID` | Midnight Target Network | `preprod` |
-| `VITE_LOGGING_LEVEL` | Pino Logger Verbosity | `info` |
-
----
-
-## 📜 Git Commits & Repository Safety
-
-This repository maintains clean commit history without scaffold remnants. All references to old scaffolds have been refactored to `confidential-voting`.
-
-```bash
-git status
-git log --oneline
+Contract Address (32 Bytes / 64 Hex Chars):
+0200dbf964f541e1950883f5b2f539b66fd6111e46ce8e6e9551fbdd180114d5
 ```
 
 ---

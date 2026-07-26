@@ -42,6 +42,7 @@ import {
   Transaction,
 } from '@midnight-ntwrk/midnight-js-protocol/ledger';
 import { fromHex, toHex } from '@midnight-ntwrk/midnight-js-utils';
+import { formatContractAddress } from '../globals';
 
 type NetworkId = string;
 
@@ -75,9 +76,10 @@ export class BrowserDeployedVotingManager implements DeployedVotingAPIProvider {
   readonly deployments$: Observable<Array<Observable<VotingDeployment>>>;
 
   resolve(contractAddress?: ContractAddress): Observable<VotingDeployment> {
+    const normalizedAddr = contractAddress ? (formatContractAddress(contractAddress) as ContractAddress) : undefined;
     const deployments = this.#deploymentsSubject.value;
     let deployment = deployments.find(
-      (d) => d.value.status === 'deployed' && d.value.api.deployedContractAddress === contractAddress,
+      (d) => d.value.status === 'deployed' && d.value.api.deployedContractAddress === normalizedAddr,
     );
 
     if (deployment) {
@@ -88,8 +90,8 @@ export class BrowserDeployedVotingManager implements DeployedVotingAPIProvider {
       status: 'in-progress',
     });
 
-    if (contractAddress) {
-      void this.joinDeployment(deployment, contractAddress);
+    if (normalizedAddr) {
+      void this.joinDeployment(deployment, normalizedAddr);
     } else {
       void this.deployDeployment(deployment);
     }
