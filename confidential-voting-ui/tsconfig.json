@@ -5,8 +5,10 @@
     "moduleResolution": "Bundler",
     "baseUrl": ".",
     "paths": {
-      "@midnight-ntwrk/confidential-voting-api": ["../api/src/index.ts"],
-      "@midnight-ntwrk/confidential-voting-contract": ["../contract/src/index.ts"]
+      "@midnight-ntwrk/confidential-voting-api": ["../api/src/index.ts", "../api/dist/index.d.ts"],
+      "@midnight-ntwrk/confidential-voting-api/*": ["../api/src/*", "../api/dist/*"],
+      "@midnight-ntwrk/confidential-voting-contract": ["../contract/src/index.ts", "../contract/dist/index.d.ts"],
+      "@midnight-ntwrk/confidential-voting-contract/*": ["../contract/src/*", "../contract/dist/*"]
     },
     "allowJs": false,
     "forceConsistentCasingInFileNames": true,
