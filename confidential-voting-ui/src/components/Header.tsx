@@ -19,7 +19,7 @@ export const Header: React.FC<HeaderProps> = ({ onJoinContract, onDeployContract
   };
 
   return (
-    <AppBar position="sticky" sx={{ bgcolor: 'rgba(3, 3, 4, 0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid #18181b', elevation: 0 }}>
+    <AppBar position="sticky" sx={{ bgcolor: 'rgba(3, 3, 4, 0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid #18181b', elevation: 0, zIndex: 1100 }}>
       <Toolbar sx={{ justifyContent: 'space-between', py: 1.5, px: { xs: 2, md: 4 } }}>
         <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
           <Box sx={{ p: 1.2, bgcolor: '#ffffff0a', borderRadius: '12px', border: '1px solid #ffffff15', display: 'flex', alignItems: 'center' }}>
@@ -36,41 +36,60 @@ export const Header: React.FC<HeaderProps> = ({ onJoinContract, onDeployContract
           <Chip label="PREPROD TESTNET" size="small" sx={{ ml: 2, bgcolor: '#18181b', border: '1px solid #27272a', color: '#a1a1aa', fontWeight: 600, fontSize: '0.7rem' }} />
         </Stack>
 
-        <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
-          <TextField
-            size="small"
-            placeholder="Enter 32-Byte Contract Address..."
-            value={joinAddress}
-            onChange={(e) => setJoinAddress(e.target.value)}
-            sx={{
-              width: 310,
-              '& .MuiOutlinedInput-root': {
-                color: '#fff',
-                bgcolor: '#09090c',
-                borderRadius: '10px',
-                fontFamily: 'monospace',
-                fontSize: '0.85rem',
-                '& fieldset': { borderColor: '#27272a' },
-                '&:hover fieldset': { borderColor: '#52525b' },
-                '&.Mui-focused fieldset': { borderColor: '#ffffff' },
-              },
+        <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
+          <Box
+            component="form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleJoin();
             }}
-          />
-          <Button variant="outlined" sx={{ color: '#ffffff', borderColor: '#27272a', borderRadius: '10px', px: 2.5 }} onClick={handleJoin}>
-            Join
-          </Button>
+            sx={{ display: 'flex', gap: 1 }}
+          >
+            <TextField
+              size="small"
+              placeholder="Paste 32-Byte Contract Address & press Enter..."
+              value={joinAddress}
+              onChange={(e) => setJoinAddress(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleJoin();
+                }
+              }}
+              sx={{
+                width: 320,
+                '& .MuiOutlinedInput-root': {
+                  color: '#fff',
+                  bgcolor: '#09090c',
+                  borderRadius: '10px',
+                  fontFamily: 'monospace',
+                  fontSize: '0.85rem',
+                  '& fieldset': { borderColor: '#27272a' },
+                  '&:hover fieldset': { borderColor: '#52525b' },
+                  '&.Mui-focused fieldset': { borderColor: '#ffffff' },
+                },
+              }}
+            />
+            <Button
+              type="submit"
+              variant="outlined"
+              sx={{ color: '#ffffff', borderColor: '#27272a', borderRadius: '10px', px: 2.5, whiteSpace: 'nowrap', '&:hover': { borderColor: '#ffffff', bgcolor: 'rgba(255,255,255,0.05)' } }}
+            >
+              Join
+            </Button>
+          </Box>
 
           {onDeployContract && (
             <Button
               variant="contained"
-              sx={{ bgcolor: '#ffffff', color: '#000000', fontWeight: 700, borderRadius: '10px', px: 2.5, '&:hover': { bgcolor: '#e4e4e7' } }}
+              sx={{ bgcolor: '#ffffff', color: '#000000', fontWeight: 700, borderRadius: '10px', px: 2.5, whiteSpace: 'nowrap', '&:hover': { bgcolor: '#e4e4e7' } }}
               onClick={onDeployContract}
             >
               + Deploy Election
             </Button>
           )}
 
-          <Button startIcon={<AccountBalanceWalletIcon />} variant="outlined" sx={{ borderRadius: '10px', borderColor: '#27272a', color: '#a1a1aa', fontWeight: 600 }}>
+          <Button startIcon={<AccountBalanceWalletIcon />} variant="outlined" sx={{ borderRadius: '10px', borderColor: '#27272a', color: '#a1a1aa', fontWeight: 600, whiteSpace: 'nowrap' }}>
             1AM Wallet
           </Button>
         </Stack>

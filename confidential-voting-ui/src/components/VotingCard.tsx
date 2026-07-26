@@ -19,16 +19,19 @@ import SecurityIcon from '@mui/icons-material/Security';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { type Observable } from 'rxjs';
 import { type VotingDeployment } from '../contexts';
 import { type VotingDerivedState } from '@midnight-ntwrk/confidential-voting-api';
 import { State } from '@midnight-ntwrk/confidential-voting-contract';
+import { CONTRACT_ADDRESS } from '../globals';
 
 export type VotingCardProps = {
   votingDeployment$?: Observable<VotingDeployment>;
+  onQuickJoinPreprod?: (contractAddress: string) => void;
 };
 
-export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$ }) => {
+export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$, onQuickJoinPreprod }) => {
   const [deployment, setDeployment] = useState<VotingDeployment | undefined>(undefined);
   const [derivedState, setDerivedState] = useState<VotingDerivedState | undefined>(undefined);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -58,11 +61,26 @@ export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$ }) => 
 
   if (!deployment) {
     return (
-      <Card sx={{ bgcolor: '#09090c', color: '#fff', borderRadius: '16px', border: '1px solid #18181b', p: 3, textAlign: 'center' }}>
+      <Card sx={{ bgcolor: '#09090c', color: '#fff', borderRadius: '16px', border: '1px solid #18181b', p: 4, textAlign: 'center' }}>
         <CardContent sx={{ py: 3 }}>
-          <Typography variant="body1" sx={{ color: '#a1a1aa', fontWeight: 500 }}>
-            No election joined yet. Use <strong>Deploy Election</strong> above or enter a 32-byte Contract Address to inspect on-chain state.
+          <Typography variant="h6" sx={{ fontWeight: 800, mb: 1, color: '#ffffff' }}>
+            No Active Election Contract Joined
           </Typography>
+          <Typography variant="body2" sx={{ color: '#a1a1aa', mb: 3, maxWidth: 500, mx: 'auto' }}>
+            Join an existing 32-byte election contract address or deploy a fresh confidential election instance on Midnight Preprod.
+          </Typography>
+          <Stack direction="row" spacing={2} sx={{ justifyContent: 'center' }}>
+            {onQuickJoinPreprod && (
+              <Button
+                variant="contained"
+                startIcon={<PlayArrowIcon />}
+                sx={{ bgcolor: '#ffffff', color: '#000000', fontWeight: 800, px: 3, py: 1.2, borderRadius: '10px' }}
+                onClick={() => onQuickJoinPreprod(CONTRACT_ADDRESS)}
+              >
+                Connect Preprod Demo Election
+              </Button>
+            )}
+          </Stack>
         </CardContent>
       </Card>
     );
@@ -73,7 +91,7 @@ export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$ }) => 
       <Card sx={{ bgcolor: '#09090c', color: '#fff', borderRadius: '16px', border: '1px solid #18181b', p: 5, textAlign: 'center' }}>
         <CircularProgress sx={{ color: '#ffffff', mb: 2 }} size={36} thickness={4} />
         <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>Connecting to Midnight Preprod...</Typography>
-        <Typography variant="body2" sx={{ color: '#a1a1aa' }}>Generating ZK proof key parameters & querying on-chain state.</Typography>
+        <Typography variant="body2" sx={{ color: '#a1a1aa' }}>Fetching ZK proving keys & subscribing to contract state.</Typography>
       </Card>
     );
   }
@@ -132,9 +150,9 @@ export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$ }) => 
     try {
       setIsSubmitting(true);
       setErrorMsg('');
-      setActionMessage(`Generating Zero-Knowledge proof & casting confidential vote for Candidate ${candidateIndex}...`);
+      setActionMessage(`Generating ZK proof & requesting 1AM Wallet balance for Candidate ${candidateIndex}...`);
       await deployment.api.vote(candidateIndex);
-      setActionMessage('Vote successfully cast and proven on Midnight!');
+      setActionMessage('Confidential ZK vote successfully proven and submitted to Midnight network!');
     } catch (err: any) {
       setErrorMsg(err?.message ?? 'Failed to cast vote');
     } finally {
@@ -146,9 +164,9 @@ export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$ }) => 
     try {
       setIsSubmitting(true);
       setErrorMsg('');
-      setActionMessage('Generating ZK commitment to initialize election...');
+      setActionMessage('Generating ZK commitment to initialize election on-chain...');
       await deployment.api.createElection(title);
-      setActionMessage('Election created successfully!');
+      setActionMessage('Election round successfully initialized!');
     } catch (err: any) {
       setErrorMsg(err?.message ?? 'Failed to create election');
     } finally {
@@ -160,9 +178,9 @@ export const VotingCard: React.FC<VotingCardProps> = ({ votingDeployment$ }) => 
     try {
       setIsSubmitting(true);
       setErrorMsg('');
-      setActionMessage('Generating proof to finalize election...');
+      setActionMessage('Generating ZK proof to finalize election round...');
       await deployment.api.finalizeElection();
-      setActionMessage('Election finalized.');
+      setActionMessage('Election successfully finalized!');
     } catch (err: any) {
       setErrorMsg(err?.message ?? 'Failed to finalize election');
     } finally {

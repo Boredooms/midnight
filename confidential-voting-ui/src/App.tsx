@@ -10,6 +10,7 @@ import { MainLayout, VotingCard } from './components';
 import { useDeployedVotingContext } from './hooks';
 import { type VotingDeployment } from './contexts';
 import { type Observable } from 'rxjs';
+import { CONTRACT_ADDRESS } from './globals';
 
 const App: React.FC = () => {
   const votingManager = useDeployedVotingContext();
@@ -22,6 +23,13 @@ const App: React.FC = () => {
     };
   }, []);
 
+  // Auto-resolve Preprod Contract on initial mount
+  useEffect(() => {
+    if (CONTRACT_ADDRESS) {
+      votingManager.resolve(CONTRACT_ADDRESS as any);
+    }
+  }, [votingManager]);
+
   useEffect(() => {
     const sub = votingManager.deployments$.subscribe(setDeployments);
     return () => sub.unsubscribe();
@@ -29,10 +37,19 @@ const App: React.FC = () => {
 
   const handleDeployNew = () => {
     votingManager.resolve();
+    scrollToActiveCard();
   };
 
   const handleJoinContract = (contractAddress: string) => {
     votingManager.resolve(contractAddress as any);
+    scrollToActiveCard();
+  };
+
+  const scrollToActiveCard = () => {
+    setTimeout(() => {
+      const el = document.getElementById('active-elections-container');
+      el?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
   };
 
   return (
@@ -130,7 +147,7 @@ const App: React.FC = () => {
       </Box>
 
       {/* Active Elections Section */}
-      <Stack spacing={4} sx={{ mb: 6 }}>
+      <Stack id="active-elections-container" spacing={4} sx={{ mb: 6 }}>
         <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography variant="h5" sx={{ fontWeight: 800, letterSpacing: '-0.02em' }}>
             Active Elections ({deployments.length})
@@ -147,13 +164,13 @@ const App: React.FC = () => {
 
         {deployments.map((deployment$, idx) => (
           <Box key={`deployment-${idx}`} data-testid={`voting-card-${idx}`}>
-            <VotingCard votingDeployment$={deployment$} />
+            <VotingCard votingDeployment$={deployment$} onQuickJoinPreprod={handleJoinContract} />
           </Box>
         ))}
 
         {deployments.length === 0 && (
           <Box data-testid="default-voting-card">
-            <VotingCard />
+            <VotingCard onQuickJoinPreprod={handleJoinContract} />
           </Box>
         )}
       </Stack>

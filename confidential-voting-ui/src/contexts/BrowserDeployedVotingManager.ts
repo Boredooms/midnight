@@ -165,7 +165,7 @@ const initializeProviders = async (logger: Logger): Promise<VotingProviders> => 
       },
       balanceTx: async (tx: UnboundTransaction, ttl?: Date): Promise<FinalizedTransaction> => {
         try {
-          logger.info({ tx, ttl }, 'Balancing transaction via wallet');
+          logger.info({ tx, ttl }, 'Balancing transaction via 1AM Wallet');
           const serializedTx = toHex(tx.serialize());
           const received = await connectedAPI.balanceUnsealedTransaction(serializedTx);
           return Transaction.deserialize<SignatureEnabled, Proof, Binding>(
@@ -175,7 +175,7 @@ const initializeProviders = async (logger: Logger): Promise<VotingProviders> => 
             fromHex(received.tx),
           );
         } catch (e) {
-          logger.error({ error: e }, 'Error balancing transaction via wallet');
+          logger.error({ error: e }, 'Error balancing transaction via 1AM Wallet');
           throw e;
         }
       },
@@ -185,7 +185,7 @@ const initializeProviders = async (logger: Logger): Promise<VotingProviders> => 
         await connectedAPI.submitTransaction(toHex(tx.serialize()));
         const txIdentifiers = tx.identifiers();
         const txId = txIdentifiers[0];
-        logger.info({ txIdentifiers }, 'Submitted transaction via wallet');
+        logger.info({ txIdentifiers }, 'Submitted transaction via 1AM Wallet');
         return txId;
       },
     },
@@ -194,56 +194,55 @@ const initializeProviders = async (logger: Logger): Promise<VotingProviders> => 
 
 const getFirstCompatibleWallet = (): InitialAPI | undefined => {
   if (!window.midnight) return undefined;
-  return Object.values(window.midnight).find(
-    (wallet): wallet is InitialAPI =>
-      !!wallet &&
-      typeof wallet === 'object' &&
-      ('apiVersion' in wallet ? semver.satisfies(wallet.apiVersion, COMPATIBLE_CONNECTOR_API_VERSION) : true),
-  );
+  const wallets = Object.values(window.midnight);
+  for (const wallet of wallets) {
+    if (wallet && typeof wallet === 'object' && 'connect' in wallet && typeof wallet.connect === 'function') {
+      return wallet as InitialAPI;
+    }
+  }
+  return undefined;
 };
-
-const COMPATIBLE_CONNECTOR_API_VERSION = '>=1.0.0';
 
 const connectToWallet = (logger: Logger, networkId: string): Promise<ConnectedAPI> => {
   return firstValueFrom(
     fnPipe(
-      interval(100),
+      interval(200),
       map(() => getFirstCompatibleWallet()),
       tap((connectorAPI) => {
-        logger.info(connectorAPI, 'Check for wallet connector API');
+        logger.info(connectorAPI, 'Check for 1AM Wallet connector API');
       }),
       filter((connectorAPI): connectorAPI is InitialAPI => !!connectorAPI),
       tap((connectorAPI) => {
-        logger.info(connectorAPI, 'Compatible wallet connector API found. Connecting.');
+        logger.info(connectorAPI, 'Compatible 1AM Wallet connector API found. Connecting...');
       }),
       take(1),
       timeout({
-        first: 1_000,
+        first: 5_000,
         with: () =>
           throwError(() => {
-            logger.error('Could not find wallet connector API');
-            return new Error('Could not find Midnight 1AM Wallet. Extension installed?');
+            logger.error('Could not find 1AM Wallet connector API');
+            return new Error('Could not find Midnight 1AM Wallet. Extension installed and enabled?');
           }),
       }),
       concatMap(async (initialAPI) => {
         const connectedAPI = await initialAPI.connect(networkId);
         const connectionStatus = await connectedAPI.getConnectionStatus();
-        logger.info(connectionStatus, 'Wallet connector API enabled status');
+        logger.info(connectionStatus, '1AM Wallet connector API enabled status');
         return connectedAPI;
       }),
       timeout({
-        first: 5_000,
+        first: 10_000,
         with: () =>
           throwError(() => {
-            logger.error('Wallet connector API has failed to respond');
-            return new Error('Midnight 1AM Wallet has failed to respond. Extension enabled?');
+            logger.error('1AM Wallet connector API has failed to respond');
+            return new Error('Midnight 1AM Wallet has failed to respond. Is the extension unlocked?');
           }),
       }),
       catchError((error, apis) =>
         error
           ? throwError(() => {
               logger.error('Unable to enable connector API ' + error);
-              return new Error('Application is not authorized');
+              return new Error(error instanceof Error ? error.message : 'Application is not authorized');
             })
           : apis,
       ),
