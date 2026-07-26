@@ -15,7 +15,7 @@ import {
 } from '@midnight-ntwrk/confidential-voting-contract';
 import { type DeployedVotingContract } from '@midnight-ntwrk/confidential-voting-api';
 import { levelPrivateStateProvider } from '@midnight-ntwrk/midnight-js-level-private-state-provider';
-import { type PrivateStateId } from '@midnight-ntwrk/midnight-js-contracts';
+import { type PrivateStateId } from '@midnight-ntwrk/midnight-js-types';
 import { type VotingPrivateState } from '@midnight-ntwrk/confidential-voting-contract';
 import { indexerPublicDataProvider } from '@midnight-ntwrk/midnight-js-indexer-public-data-provider';
 import { NodeZkConfigProvider } from '@midnight-ntwrk/midnight-js-node-zk-config-provider';
@@ -24,7 +24,8 @@ import { type Logger } from 'pino';
 import { toHex } from '@midnight-ntwrk/midnight-js-utils';
 import { Config, StandaloneConfig } from './config.js';
 import { MidnightWalletProvider } from './midnight-wallet-provider.js';
-import { TestEnvironment, unshieldedToken } from '@midnight-ntwrk/testkit-js';
+import { TestEnvironment } from '@midnight-ntwrk/testkit-js';
+import { unshieldedToken } from '@midnight-ntwrk/midnight-js-protocol/ledger';
 import { type WalletFacade } from '@midnight-ntwrk/wallet-sdk';
 import { syncWallet, waitForUnshieldedFunds } from './wallet-utils.js';
 import { generateDust } from './generate-dust.js';
