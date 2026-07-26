@@ -7,7 +7,7 @@
 
 ## 📸 High-Craft Monochrome DApp Preview
 
-![Confidential Voting DApp Dashboard](file:///C:/Users/devar/.gemini/antigravity-ide/brain/5298cde7-fa49-4dd0-9c25-92865c96528c/full_page_ui_1785093718595.png)
+![Confidential Voting DApp Dashboard](./docs/screenshots/monochrome_dashboard.png)
 
 *Figure 1: Full-page view of the high-craft monochrome Confidential Voting DApp featuring 1AM Wallet integration, Zero-Knowledge architecture cards, active election tallies, and interactive deployment documentation.*
 
