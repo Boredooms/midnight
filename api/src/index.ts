@@ -1,7 +1,5 @@
-import {
-  type ContractAddress,
-  type Logger,
-} from '@midnight-ntwrk/midnight-js-types';
+import { type ContractAddress } from '@midnight-ntwrk/compact-runtime';
+import type { Logger } from 'pino';
 import {
   type DeployedVotingAPI,
   type DeployedVotingContract,
@@ -163,5 +161,6 @@ export class VotingAPI implements DeployedVotingAPI {
   }
 }
 
+export { randomBytes } from './utils/index.js';
 export * as utils from './utils/index.js';
 export * from './common-types.js';
