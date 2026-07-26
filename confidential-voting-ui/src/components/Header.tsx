@@ -21,7 +21,7 @@ export const Header: React.FC<HeaderProps> = ({ onJoinContract, onDeployContract
   return (
     <AppBar position="static" sx={{ bgcolor: '#0b0b10', borderBottom: '1px solid #1f1f2e', elevation: 0 }}>
       <Toolbar sx={{ justifyContent: 'space-between', py: 1 }}>
-        <Stack direction="row" spacing={2} alignItems="center">
+        <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
           <Box sx={{ p: 1, bgcolor: '#00f2fe22', borderRadius: 2, display: 'flex', alignItems: 'center' }}>
             <LockOutlinedIcon sx={{ color: '#00f2fe', fontSize: 28 }} />
           </Box>
@@ -36,7 +36,7 @@ export const Header: React.FC<HeaderProps> = ({ onJoinContract, onDeployContract
           <Chip label="Preprod Testnet" size="small" color="primary" variant="outlined" sx={{ ml: 2, borderColor: '#00f2fe', color: '#00f2fe' }} />
         </Stack>
 
-        <Stack direction="row" spacing={2} alignItems="center">
+        <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
           <TextField
             size="small"
             placeholder="Enter Deployed Contract Address..."

@@ -38,7 +38,7 @@ const App: React.FC = () => {
         </Typography>
 
         <Grid container spacing={3} sx={{ textAlign: 'left', mt: 2 }}>
-          <Grid item xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Card sx={{ bgcolor: '#12121a', border: '1px solid #222233', height: '100%' }}>
               <CardContent>
                 <VisibilityOffIcon sx={{ color: '#00f2fe', fontSize: 36, mb: 1 }} />
@@ -49,7 +49,7 @@ const App: React.FC = () => {
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Card sx={{ bgcolor: '#12121a', border: '1px solid #222233', height: '100%' }}>
               <CardContent>
                 <VerifiedUserIcon sx={{ color: '#4facfe', fontSize: 36, mb: 1 }} />
@@ -60,7 +60,7 @@ const App: React.FC = () => {
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Card sx={{ bgcolor: '#12121a', border: '1px solid #222233', height: '100%' }}>
               <CardContent>
                 <SecurityIcon sx={{ color: '#ff4081', fontSize: 36, mb: 1 }} />

@@ -3,6 +3,7 @@ import {
   type ConnectedAPI,
 } from '@midnight-ntwrk/dapp-connector-api';
 import { type ContractAddress } from '@midnight-ntwrk/compact-runtime';
+import { type UnboundTransaction } from '@midnight-ntwrk/midnight-js-types';
 import {
   type VotingCircuitKeys,
   type VotingDerivedState,
@@ -38,7 +39,6 @@ import {
   type Proof,
   type SignatureEnabled,
   type TransactionId,
-  type UnboundTransaction,
   Transaction,
 } from '@midnight-ntwrk/midnight-js-protocol/ledger';
 import { fromHex, toHex } from '@midnight-ntwrk/midnight-js-utils';
