@@ -6,13 +6,11 @@ import { type Observable } from 'rxjs';
 
 export type VotingCircuitKeys = 'createElection' | 'vote' | 'finalizeElection';
 
-export type votingPrivateStateKey = typeof votingPrivateStateKey;
-
 export type VotingContract = Contract<VotingPrivateState>;
 
 export type DeployedVotingContract = DeployedContract<VotingContract>;
 
-export type VotingProviders = MidnightProviders<VotingCircuitKeys, VotingPrivateState>;
+export type VotingProviders = MidnightProviders<VotingCircuitKeys, string, VotingPrivateState>;
 
 export type VotingDerivedState = {
   readonly state: number;

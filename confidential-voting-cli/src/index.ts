@@ -9,10 +9,10 @@ import {
   randomBytes,
 } from '@midnight-ntwrk/confidential-voting-api';
 import {
-  type ContractAddress,
   type Ledger,
   State,
 } from '@midnight-ntwrk/confidential-voting-contract';
+import { type ContractAddress } from '@midnight-ntwrk/compact-runtime';
 import { type DeployedVotingContract } from '@midnight-ntwrk/confidential-voting-api';
 import { levelPrivateStateProvider } from '@midnight-ntwrk/midnight-js-level-private-state-provider';
 import { type PrivateStateId } from '@midnight-ntwrk/midnight-js-types';
@@ -239,7 +239,7 @@ export const run = async (config: Config, testEnv: TestEnvironment, logger: Logg
 
     const zkConfigProvider = new NodeZkConfigProvider<'createElection' | 'vote' | 'finalizeElection'>(config.zkConfigPath);
     const providers: VotingProviders = {
-      privateStateProvider: levelPrivateStateProvider<PrivateStateId, VotingPrivateState>({
+      privateStateProvider: levelPrivateStateProvider<string, VotingPrivateState>({
         privateStateStoreName: config.privateStateStoreName,
         signingKeyStoreName: `${config.privateStateStoreName}-signing-keys`,
         privateStoragePasswordProvider: () => {
