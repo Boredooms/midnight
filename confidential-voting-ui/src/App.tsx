@@ -9,11 +9,13 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { MainLayout, VotingCard } from './components';
 import { useDeployedVotingContext } from './hooks';
 import { type VotingDeployment } from './contexts';
+import { useWallet } from './contexts/WalletContext';
 import { type Observable } from 'rxjs';
 import { CONTRACT_ADDRESS } from './globals';
 
 const App: React.FC = () => {
   const votingManager = useDeployedVotingContext();
+  const wallet = useWallet();
   const [deployments, setDeployments] = useState<Array<Observable<VotingDeployment>>>([]);
 
   useEffect(() => {
@@ -22,13 +24,6 @@ const App: React.FC = () => {
       document.documentElement.style.scrollBehavior = 'auto';
     };
   }, []);
-
-  // Auto-resolve Preprod Contract on initial mount
-  useEffect(() => {
-    if (CONTRACT_ADDRESS) {
-      votingManager.resolve(CONTRACT_ADDRESS as any);
-    }
-  }, [votingManager]);
 
   useEffect(() => {
     const sub = votingManager.deployments$.subscribe(setDeployments);
@@ -45,8 +40,13 @@ const App: React.FC = () => {
     scrollToActiveCard();
   };
 
+  // Retry: if wallet isn't connected yet, trigger wallet connect; otherwise retry the deployment
   const handleRetryConnect = () => {
-    votingManager.retry(CONTRACT_ADDRESS as any);
+    if (wallet.status !== 'connected') {
+      void wallet.connect();
+    } else {
+      votingManager.retry(CONTRACT_ADDRESS as any);
+    }
   };
 
   const scrollToActiveCard = () => {

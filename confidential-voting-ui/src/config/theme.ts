@@ -1,4 +1,4 @@
-import { createTheme, alpha } from '@mui/material';
+import { createTheme } from '@mui/material';
 
 export const theme = createTheme({
   typography: {
@@ -43,7 +43,8 @@ export const theme = createTheme({
           backgroundImage: 'none',
           borderColor: '#18181b',
           borderRadius: 16,
-          transition: 'transform 0.25s ease-out, border-color 0.25s ease-out, box-shadow 0.25s ease-out',
+          transition:
+            'transform 0.25s ease-out, border-color 0.25s ease-out, box-shadow 0.25s ease-out',
           '&:hover': {
             borderColor: '#3f3f46',
             transform: 'translateY(-2px)',
@@ -60,7 +61,7 @@ export const theme = createTheme({
           fontWeight: 600,
           transition: 'all 0.2s ease-in-out',
         },
-        containedPrimary: {
+        contained: {
           backgroundColor: '#ffffff',
           color: '#000000',
           '&:hover': {
@@ -68,7 +69,7 @@ export const theme = createTheme({
             transform: 'translateY(-1px)',
           },
         },
-        outlinedPrimary: {
+        outlined: {
           borderColor: '#27272a',
           color: '#ffffff',
           '&:hover': {

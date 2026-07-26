@@ -1,5 +1,4 @@
 import {
-  type InitialAPI,
   type ConnectedAPI,
 } from '@midnight-ntwrk/dapp-connector-api';
 import { type ContractAddress } from '@midnight-ntwrk/compact-runtime';
@@ -11,25 +10,13 @@ import {
   VotingAPI,
 } from '@midnight-ntwrk/confidential-voting-api';
 import { type VotingPrivateState } from '@midnight-ntwrk/confidential-voting-contract';
-import { levelPrivateStateProvider } from '@midnight-ntwrk/midnight-js-level-private-state-provider';
 import { FetchZkConfigProvider } from '@midnight-ntwrk/midnight-js-fetch-zk-config-provider';
 import { httpClientProofProvider } from '@midnight-ntwrk/midnight-js-http-client-proof-provider';
 import { indexerPublicDataProvider } from '@midnight-ntwrk/midnight-js-indexer-public-data-provider';
 import {
   BehaviorSubject,
-  catchError,
-  concatMap,
-  filter,
-  firstValueFrom,
-  interval,
-  map,
   type Observable,
-  take,
-  tap,
-  throwError,
-  timeout,
 } from 'rxjs';
-import { pipe as fnPipe } from 'fp-ts/function';
 import { type Logger } from 'pino';
 import { inMemoryPrivateStateProvider } from '../in-memory-private-state-provider';
 import {
@@ -42,8 +29,6 @@ import {
 } from '@midnight-ntwrk/midnight-js-protocol/ledger';
 import { fromHex, toHex } from '@midnight-ntwrk/midnight-js-utils';
 import { formatContractAddress } from '../globals';
-
-type NetworkId = string;
 
 export type VotingDeployment =
   | {
@@ -62,11 +47,13 @@ export interface DeployedVotingAPIProvider {
   readonly deployments$: Observable<Array<Observable<VotingDeployment>>>;
   readonly resolve: (contractAddress?: ContractAddress) => Observable<VotingDeployment>;
   readonly retry: (contractAddress?: ContractAddress) => Observable<VotingDeployment>;
+  readonly setConnectedAPI: (api: ConnectedAPI) => void;
 }
 
 export class BrowserDeployedVotingManager implements DeployedVotingAPIProvider {
   readonly #deploymentsSubject: BehaviorSubject<Array<BehaviorSubject<VotingDeployment>>>;
   #initializedProviders: Promise<VotingProviders> | undefined;
+  #connectedAPI: ConnectedAPI | undefined;
 
   constructor(private readonly logger: Logger) {
     this.#deploymentsSubject = new BehaviorSubject<Array<BehaviorSubject<VotingDeployment>>>([]);
@@ -75,13 +62,24 @@ export class BrowserDeployedVotingManager implements DeployedVotingAPIProvider {
 
   readonly deployments$: Observable<Array<Observable<VotingDeployment>>>;
 
+  /**
+   * Called by WalletContext once the user has connected their 1AM wallet.
+   * Resets any cached providers so the next deploy/join uses the fresh connection.
+   */
+  setConnectedAPI(api: ConnectedAPI): void {
+    this.#connectedAPI = api;
+    this.#initializedProviders = undefined;
+  }
+
   retry(contractAddress?: ContractAddress): Observable<VotingDeployment> {
     this.#initializedProviders = undefined;
     return this.resolve(contractAddress);
   }
 
   resolve(contractAddress?: ContractAddress): Observable<VotingDeployment> {
-    const normalizedAddr = contractAddress ? (formatContractAddress(contractAddress) as ContractAddress) : undefined;
+    const normalizedAddr = contractAddress
+      ? (formatContractAddress(contractAddress) as ContractAddress)
+      : undefined;
     const deployments = this.#deploymentsSubject.value;
     let deployment = deployments.find(
       (d) => d.value.status === 'deployed' && d.value.api.deployedContractAddress === normalizedAddr,
@@ -107,7 +105,15 @@ export class BrowserDeployedVotingManager implements DeployedVotingAPIProvider {
   }
 
   private getProviders(): Promise<VotingProviders> {
-    return this.#initializedProviders ?? (this.#initializedProviders = initializeProviders(this.logger));
+    if (!this.#connectedAPI) {
+      return Promise.reject(
+        new Error(
+          'Wallet not connected. Please click "Connect 1AM Wallet" and approve the connection in the extension popup.',
+        ),
+      );
+    }
+    const api = this.#connectedAPI;
+    return (this.#initializedProviders ??= initializeProviders(this.logger, api));
   }
 
   private async deployDeployment(deployment: BehaviorSubject<VotingDeployment>): Promise<void> {
@@ -148,18 +154,35 @@ export class BrowserDeployedVotingManager implements DeployedVotingAPIProvider {
   }
 }
 
-const initializeProviders = async (logger: Logger): Promise<VotingProviders> => {
-  const networkId = (import.meta.env.VITE_NETWORK_ID ?? 'preprod') as NetworkId;
-  const connectedAPI = await connectToWallet(logger, networkId);
+const initializeProviders = async (
+  logger: Logger,
+  connectedAPI: ConnectedAPI,
+): Promise<VotingProviders> => {
   const zkConfigPath = window.location.origin;
-  const keyMaterialProvider = new FetchZkConfigProvider<VotingCircuitKeys>(zkConfigPath, fetch.bind(window));
-  const config = await connectedAPI.getConfiguration();
+  const keyMaterialProvider = new FetchZkConfigProvider<VotingCircuitKeys>(
+    zkConfigPath,
+    fetch.bind(window),
+  );
+
+  const [config, shieldedAddresses] = await Promise.all([
+    connectedAPI.getConfiguration(),
+    connectedAPI.getShieldedAddresses(),
+  ]);
+
+  logger.info({ config }, 'Wallet configuration retrieved');
+
+  if (!config.proverServerUri) {
+    throw new Error(
+      'Prover server URI not configured in your 1AM Wallet settings. Please configure it and reconnect.',
+    );
+  }
+
   const inMemoryStateProvider = inMemoryPrivateStateProvider<string, VotingPrivateState>();
-  const shieldedAddresses = await connectedAPI.getShieldedAddresses();
+
   return {
     privateStateProvider: inMemoryStateProvider,
     zkConfigProvider: keyMaterialProvider,
-    proofProvider: httpClientProofProvider(config.proverServerUri!, keyMaterialProvider),
+    proofProvider: httpClientProofProvider(config.proverServerUri, keyMaterialProvider),
     publicDataProvider: indexerPublicDataProvider(config.indexerUri, config.indexerWsUri),
     walletProvider: {
       getCoinPublicKey(): string {
@@ -170,7 +193,7 @@ const initializeProviders = async (logger: Logger): Promise<VotingProviders> => 
       },
       balanceTx: async (tx: UnboundTransaction, ttl?: Date): Promise<FinalizedTransaction> => {
         try {
-          logger.info({ tx, ttl }, 'Balancing transaction via 1AM Wallet');
+          logger.info({ ttl }, 'Balancing transaction via 1AM Wallet');
           const serializedTx = toHex(tx.serialize());
           const received = await connectedAPI.balanceUnsealedTransaction(serializedTx);
           return Transaction.deserialize<SignatureEnabled, Proof, Binding>(
@@ -195,77 +218,4 @@ const initializeProviders = async (logger: Logger): Promise<VotingProviders> => 
       },
     },
   };
-};
-
-const getFirstCompatibleWallet = (): InitialAPI | undefined => {
-  if (typeof window === 'undefined' || !window.midnight) return undefined;
-  const midnightObj = window.midnight as Record<string, unknown>;
-
-  // Check known 1AM Wallet / Midnight extension property names
-  if (midnightObj['mn_1am'] && typeof (midnightObj['mn_1am'] as any).connect === 'function') {
-    return midnightObj['mn_1am'] as InitialAPI;
-  }
-  if (midnightObj['1am-wallet'] && typeof (midnightObj['1am-wallet'] as any).connect === 'function') {
-    return midnightObj['1am-wallet'] as InitialAPI;
-  }
-  if (midnightObj['midnight'] && typeof (midnightObj['midnight'] as any).connect === 'function') {
-    return midnightObj['midnight'] as InitialAPI;
-  }
-
-  // Fallback to searching any key in window.midnight
-  const wallets = Object.values(midnightObj);
-  for (const wallet of wallets) {
-    if (wallet && typeof wallet === 'object' && 'connect' in wallet && typeof (wallet as any).connect === 'function') {
-      return wallet as InitialAPI;
-    }
-  }
-  return undefined;
-};
-
-const connectToWallet = (logger: Logger, networkId: string): Promise<ConnectedAPI> => {
-  return firstValueFrom(
-    fnPipe(
-      interval(200),
-      map(() => getFirstCompatibleWallet()),
-      tap((connectorAPI) => {
-        logger.info(connectorAPI, 'Check for 1AM Wallet connector API');
-      }),
-      filter((connectorAPI): connectorAPI is InitialAPI => !!connectorAPI),
-      tap((connectorAPI) => {
-        logger.info(connectorAPI, 'Compatible 1AM Wallet connector API found. Prompting user authorization...');
-      }),
-      take(1),
-      timeout({
-        first: 10_000,
-        with: () =>
-          throwError(() => {
-            logger.error('Could not find 1AM Wallet connector API in window.midnight');
-            return new Error('Midnight 1AM Wallet extension not detected in browser. Is the extension installed & enabled?');
-          }),
-      }),
-      concatMap(async (initialAPI) => {
-        const connectedAPI = await initialAPI.connect(networkId);
-        const connectionStatus = await connectedAPI.getConnectionStatus();
-        logger.info(connectionStatus, '1AM Wallet connector API enabled status');
-        return connectedAPI;
-      }),
-      // Allow up to 120 seconds for user to approve the authorization popup in 1AM Wallet
-      timeout({
-        first: 120_000,
-        with: () =>
-          throwError(() => {
-            logger.error('1AM Wallet connector API approval timed out');
-            return new Error('1AM Wallet connection approval timed out. Please click "Connect 1AM Wallet" and approve in the extension popup.');
-          }),
-      }),
-      catchError((error, apis) =>
-        error
-          ? throwError(() => {
-              logger.error('Unable to enable connector API: ' + error);
-              return new Error(error instanceof Error ? error.message : 'Application is not authorized');
-            })
-          : apis,
-      ),
-    ),
-  );
 };

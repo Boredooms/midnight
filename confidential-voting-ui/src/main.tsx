@@ -9,7 +9,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { theme } from './config/theme';
 import '@midnight-ntwrk/dapp-connector-api';
 import * as pino from 'pino';
-import { DeployedVotingProvider } from './contexts';
+import { WalletProvider, DeployedVotingProvider } from './contexts';
 
 const networkId = (import.meta.env.VITE_NETWORK_ID ?? 'preprod') as NetworkId;
 setNetworkId(networkId);
@@ -24,9 +24,12 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <CssBaseline />
     <ThemeProvider theme={theme}>
-      <DeployedVotingProvider logger={logger}>
-        <App />
-      </DeployedVotingProvider>
+      {/* WalletProvider must wrap DeployedVotingProvider so DeployedVotingProvider can read wallet state */}
+      <WalletProvider>
+        <DeployedVotingProvider logger={logger}>
+          <App />
+        </DeployedVotingProvider>
+      </WalletProvider>
     </ThemeProvider>
   </React.StrictMode>,
 );
