@@ -45,8 +45,8 @@ const AppPage: React.FC = () => {
               <Tooltip title="Proof Server (localhost:6300)" arrow>
                 <Chip icon={<CircleIcon sx={{ fontSize: '8px !important', color: '#22c55e !important' }} />} label="Proof" size="small" sx={{ bgcolor: '#09090c', border: '1px solid #18181b', color: '#52525b', fontSize: '0.68rem', height: 22 }} />
               </Tooltip>
-              <Tooltip title="Network: preprod" arrow>
-                <Chip icon={<CircleIcon sx={{ fontSize: '8px !important', color: '#22c55e !important' }} />} label="Preprod" size="small" sx={{ bgcolor: '#09090c', border: '1px solid #18181b', color: '#52525b', fontSize: '0.68rem', height: 22 }} />
+              <Tooltip title={`Network: ${import.meta.env.VITE_NETWORK_ID ?? 'preprod'}`} arrow>
+                <Chip icon={<CircleIcon sx={{ fontSize: '8px !important', color: '#22c55e !important' }} />} label={import.meta.env.VITE_NETWORK_ID ?? 'preprod'} size="small" sx={{ bgcolor: '#09090c', border: '1px solid #18181b', color: '#52525b', fontSize: '0.68rem', height: 22 }} />
               </Tooltip>
             </Stack>
           </Stack>
@@ -56,9 +56,11 @@ const AppPage: React.FC = () => {
             <Button variant="contained" size="small" startIcon={<AddIcon sx={{ fontSize: 16 }} />} onClick={handleDeployNew} sx={{ px: 2.5 }}>
               Deploy Election
             </Button>
-            <Button variant="outlined" size="small" onClick={() => handleJoinContract(CONTRACT_ADDRESS)} sx={{ borderColor: '#27272a', color: '#a1a1aa', px: 2.5 }}>
-              Join Demo Contract
-            </Button>
+            {CONTRACT_ADDRESS && (
+              <Button variant="outlined" size="small" onClick={() => handleJoinContract(CONTRACT_ADDRESS)} sx={{ borderColor: '#27272a', color: '#a1a1aa', px: 2.5 }}>
+                Join Demo Contract
+              </Button>
+            )}
           </Stack>
 
           {/* Elections */}

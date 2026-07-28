@@ -83,7 +83,7 @@ export const VotingCard: React.FC<VotingCardProps> = ({
           <Typography variant="body2" sx={{ color: '#71717a', mb: 3, maxWidth: 400, mx: 'auto' }}>
             Deploy a new election or join an existing contract to get started.
           </Typography>
-          {onQuickJoinPreprod && (
+          {onQuickJoinPreprod && CONTRACT_ADDRESS && (
             <Button
               variant="outlined"
               size="small"
@@ -219,7 +219,8 @@ export const VotingCard: React.FC<VotingCardProps> = ({
       setIsSubmitting(true);
       setErrorMsg('');
       setActionMessage('Initializing election on-chain…');
-      await deployment.api.createElection('Confidential Election');
+      // Default 1 hour voting window
+      await deployment.api.createElection('Confidential Election', 3600n);
       setActionMessage('Election initialized.');
       setTimeout(() => setActionMessage(''), 4000);
     } catch (err: any) {
@@ -234,7 +235,12 @@ export const VotingCard: React.FC<VotingCardProps> = ({
       setIsSubmitting(true);
       setErrorMsg('');
       setActionMessage('Finalizing election…');
-      await deployment.api.finalizeElection();
+      // Owner can force-finalize; otherwise anyone can finalize after deadline
+      if (derivedState?.isOwner) {
+        await deployment.api.ownerFinalizeElection();
+      } else {
+        await deployment.api.finalizeElection();
+      }
       setActionMessage('Election finalized.');
       setTimeout(() => setActionMessage(''), 4000);
     } catch (err: any) {
@@ -468,8 +474,8 @@ export const VotingCard: React.FC<VotingCardProps> = ({
               </Stack>
             )}
 
-            {/* Finalize button (owner only) */}
-            {isOpen && derivedState?.isOwner && (
+            {/* Finalize button (owner can force, anyone after deadline) */}
+            {isOpen && (
               <Button
                 fullWidth
                 variant="outlined"
@@ -483,7 +489,7 @@ export const VotingCard: React.FC<VotingCardProps> = ({
                   '&:hover': { borderColor: '#ef4444', color: '#fca5a5' },
                 }}
               >
-                Finalize Election
+                {derivedState?.isOwner ? 'Finalize (Owner)' : 'Finalize (After Deadline)'}
               </Button>
             )}
           </Box>

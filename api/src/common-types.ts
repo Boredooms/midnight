@@ -4,7 +4,7 @@ import { type DeployedContract, type FoundContract } from '@midnight-ntwrk/midni
 import { type Contract, type VotingPrivateState } from '@midnight-ntwrk/confidential-voting-contract';
 import { type Observable } from 'rxjs';
 
-export type VotingCircuitKeys = 'createElection' | 'vote' | 'finalizeElection';
+export type VotingCircuitKeys = 'createElection' | 'vote' | 'finalizeElection' | 'ownerFinalizeElection';
 
 export type VotingContract = Contract<VotingPrivateState>;
 
@@ -19,12 +19,15 @@ export type VotingDerivedState = {
   readonly candidate1Tally: bigint;
   readonly totalVotes: bigint;
   readonly isOwner: boolean;
+  readonly deadline: bigint;
+  readonly winner: number;
 };
 
 export interface DeployedVotingAPI {
   readonly deployedContractAddress: ContractAddress;
   readonly state$: Observable<VotingDerivedState>;
-  readonly createElection: (title: string) => Promise<void>;
+  readonly createElection: (title: string, durationSeconds?: bigint) => Promise<void>;
   readonly vote: (candidateIndex: number) => Promise<void>;
   readonly finalizeElection: () => Promise<void>;
+  readonly ownerFinalizeElection: () => Promise<void>;
 }

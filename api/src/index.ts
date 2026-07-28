@@ -64,6 +64,8 @@ export class VotingAPI implements DeployedVotingAPI {
           candidate0Tally: ledgerState.candidate0Tally,
           candidate1Tally: ledgerState.candidate1Tally,
           totalVotes: ledgerState.totalVotes,
+          deadline: ledgerState.deadline,
+          winner: ledgerState.winner,
           isOwner: toHex(ledgerState.owner) === toHex(hashedSecretKey),
         };
       },
@@ -74,9 +76,11 @@ export class VotingAPI implements DeployedVotingAPI {
 
   readonly state$: Observable<VotingDerivedState>;
 
-  async createElection(title: string): Promise<void> {
-    this.logger?.info(`createElection: ${title}`);
-    const txData = await this.deployedContract.callTx.createElection(title);
+  async createElection(title: string, durationSeconds?: bigint): Promise<void> {
+    // Default: 1 hour voting window (3600 seconds)
+    const duration = durationSeconds ?? 3600n;
+    this.logger?.info(`createElection: ${title}, duration: ${duration}s`);
+    const txData = await this.deployedContract.callTx.createElection(title, duration);
     this.logger?.trace({
       transactionAdded: {
         circuit: 'createElection',
@@ -104,6 +108,18 @@ export class VotingAPI implements DeployedVotingAPI {
     this.logger?.trace({
       transactionAdded: {
         circuit: 'finalizeElection',
+        txHash: txData.public.txHash,
+        blockHeight: txData.public.blockHeight,
+      },
+    });
+  }
+
+  async ownerFinalizeElection(): Promise<void> {
+    this.logger?.info('ownerFinalizeElection');
+    const txData = await this.deployedContract.callTx.ownerFinalizeElection();
+    this.logger?.trace({
+      transactionAdded: {
+        circuit: 'ownerFinalizeElection',
         txHash: txData.public.txHash,
         blockHeight: txData.public.blockHeight,
       },
