@@ -58,7 +58,7 @@ jspm_packages/
 *.sln
 
 # Compact
-managed/
+# managed/ — we commit the compiled output for Vercel deployment
 
 .claude
 .midnight-expert

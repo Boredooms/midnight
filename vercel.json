@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd confidential-voting-ui && npm run build && cp -r ../contract/src/managed/confidential-voting/keys ./dist/keys && cp -r ../contract/src/managed/confidential-voting/zkir ./dist/zkir",
+  "buildCommand": "cd confidential-voting-ui && rm -rf ./dist && vite build --mode preprod && cp -r ../contract/src/managed/confidential-voting/keys ./dist/keys && cp -r ../contract/src/managed/confidential-voting/zkir ./dist/zkir",
   "outputDirectory": "confidential-voting-ui/dist",
   "installCommand": "npm ci --legacy-peer-deps",
   "framework": null,
