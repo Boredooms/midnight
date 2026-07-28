@@ -205,10 +205,15 @@ export const VotingCard: React.FC<VotingCardProps> = ({
       setErrorMsg('');
       setActionMessage(`Generating ZK proof for candidate ${candidateIndex}…`);
       await deployment.api.vote(candidateIndex);
-      setActionMessage('Vote submitted successfully.');
+      setActionMessage('Vote submitted successfully — tally updated live.');
       setTimeout(() => setActionMessage(''), 4000);
     } catch (err: any) {
-      setErrorMsg(err?.message ?? 'Vote failed');
+      const msg = err?.message ?? 'Vote failed';
+      if (msg.includes('already voted')) {
+        setErrorMsg('You have already voted in this election. Each voter gets one ballot (nullifier protection).');
+      } else {
+        setErrorMsg(msg);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -310,10 +315,24 @@ export const VotingCard: React.FC<VotingCardProps> = ({
           )}
         </Stack>
 
-        {/* Title */}
+        {/* Title + sharing */}
         <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, letterSpacing: '-0.02em' }}>
           {derivedState?.electionTitle ?? 'Confidential Election'}
         </Typography>
+
+        {/* Live indicator + share address */}
+        <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', mb: 1 }}>
+          <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
+            <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: isOpen ? '#22c55e' : '#52525b', animation: isOpen ? 'pulse 2s infinite' : 'none', '@keyframes pulse': { '0%, 100%': { opacity: 1 }, '50%': { opacity: 0.4 } } }} />
+            <Typography variant="caption" sx={{ color: isOpen ? '#22c55e' : '#52525b', fontWeight: 600, fontSize: '0.7rem' }}>
+              {isOpen ? 'LIVE' : isFinalized ? 'ENDED' : 'PENDING'}
+            </Typography>
+          </Stack>
+          <Typography variant="caption" sx={{ color: '#3f3f46' }}>•</Typography>
+          <Typography variant="caption" sx={{ color: '#52525b', fontSize: '0.7rem' }}>
+            Share address for others to join & vote
+          </Typography>
+        </Stack>
 
         {/* Feedback messages */}
         {errorMsg && (
