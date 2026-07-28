@@ -239,14 +239,9 @@ export const VotingCard: React.FC<VotingCardProps> = ({
     try {
       setIsSubmitting(true);
       setErrorMsg('');
-      setActionMessage('Finalizing election…');
-      // Owner can force-finalize; otherwise anyone can finalize after deadline
-      if (derivedState?.isOwner) {
-        await deployment.api.ownerFinalizeElection();
-      } else {
-        await deployment.api.finalizeElection();
-      }
-      setActionMessage('Election finalized.');
+      setActionMessage('Ending election & publishing results on-chain…');
+      await deployment.api.ownerFinalizeElection();
+      setActionMessage('Election ended. Results published on-chain.');
       setTimeout(() => setActionMessage(''), 4000);
     } catch (err: any) {
       setErrorMsg(err?.message ?? 'Failed to finalize');
@@ -494,7 +489,7 @@ export const VotingCard: React.FC<VotingCardProps> = ({
             )}
 
             {/* Finalize button (owner can force, anyone after deadline) */}
-            {isOpen && (
+            {isOpen && derivedState?.isOwner && (
               <Button
                 fullWidth
                 variant="outlined"
@@ -508,7 +503,7 @@ export const VotingCard: React.FC<VotingCardProps> = ({
                   '&:hover': { borderColor: '#ef4444', color: '#fca5a5' },
                 }}
               >
-                {derivedState?.isOwner ? 'Finalize (Owner)' : 'Finalize (After Deadline)'}
+                End Election & Publish Results
               </Button>
             )}
           </Box>
