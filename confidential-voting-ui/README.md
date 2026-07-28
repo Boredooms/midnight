@@ -2,6 +2,12 @@
 
 A privacy-preserving voting DApp built on the Midnight Network using Compact smart contracts and zero-knowledge proofs.
 
+## Live Demo
+
+🌐 **Live URL:** [https://dist-pi-sandy-35.vercel.app](https://dist-pi-sandy-35.vercel.app)
+
+🎥 **Demo Video:** [docs/demo-video.mp4](docs/demo-video.mp4) — Wallet connect + circuit call demonstration
+
 ## Privacy Claim
 
 **Individual votes are private.** Each voter's ballot choice is proven off-chain via a ZK proof generated locally on the voter's machine. The proof demonstrates that the voter made a valid selection (candidate 0 or 1) without revealing which candidate was chosen. Only the aggregate tally counters are public on-chain — individual vote choices never appear on the ledger.
