@@ -39,7 +39,7 @@ const LandingPage: React.FC = () => {
         ref={heroRef}
         sx={{
           position: 'relative',
-          overflow: 'hidden',
+          overflow: 'visible',
           minHeight: '100vh',
           display: 'flex',
           alignItems: 'center',
@@ -59,9 +59,9 @@ const LandingPage: React.FC = () => {
               <Typography
                 sx={{
                   fontWeight: 900,
-                  letterSpacing: '-0.05em',
-                  fontSize: { xs: '3rem', sm: '4.5rem', md: '6rem' },
-                  lineHeight: 0.95,
+                  letterSpacing: '-0.04em',
+                  fontSize: { xs: '2.8rem', sm: '4rem', md: '5.5rem' },
+                  lineHeight: 1.1,
                   color: '#ffffff',
                 }}
               >
@@ -69,13 +69,13 @@ const LandingPage: React.FC = () => {
               </Typography>
             </Box>
 
-            <Box ref={subtitleRef} sx={{ opacity: 0, mt: '-4px !important' }}>
+            <Box ref={subtitleRef} sx={{ opacity: 0 }}>
               <Typography
                 sx={{
                   fontWeight: 900,
-                  letterSpacing: '-0.05em',
-                  fontSize: { xs: '2.4rem', sm: '3.8rem', md: '5.2rem' },
-                  lineHeight: 1,
+                  letterSpacing: '-0.04em',
+                  fontSize: { xs: '2.8rem', sm: '4rem', md: '5.5rem' },
+                  lineHeight: 1.1,
                   background: 'linear-gradient(180deg, #52525b 0%, #27272a 100%)',
                   backgroundClip: 'text',
                   WebkitBackgroundClip: 'text',
@@ -118,7 +118,7 @@ const LandingPage: React.FC = () => {
         </Container>
 
         {/* Bottom fade */}
-        <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 200, background: 'linear-gradient(to top, #030304, transparent)', pointerEvents: 'none' }} />
+        <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 200, background: 'linear-gradient(to top, #030304, transparent)', pointerEvents: 'none', zIndex: 1 }} />
       </Box>
     </Box>
   );
