@@ -1,114 +1,106 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Box, Typography, Container, Stack, Button, Chip } from '@mui/material';
-import { motion, useInView } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ParticleField } from '../components/ParticleField';
 import { Navbar } from '../components/Navbar';
 
-const Reveal: React.FC<{ children: React.ReactNode; delay?: number }> = ({ children, delay = 0 }) => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-40px' });
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 28 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
-    >
-      {children}
-    </motion.div>
-  );
-};
+gsap.registerPlugin(ScrollTrigger);
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
+  const heroRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLDivElement>(null);
+  const subtitleRef = useRef<HTMLDivElement>(null);
+  const descRef = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
+
+      tl.fromTo(titleRef.current, { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 1.2 })
+        .fromTo(subtitleRef.current, { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 1 }, '-=0.8')
+        .fromTo(descRef.current, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, '-=0.6')
+        .fromTo(ctaRef.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, '-=0.4');
+    }, heroRef);
+
+    return () => ctx.revert();
+  }, []);
 
   return (
     <Box sx={{ bgcolor: '#030304', minHeight: '100vh' }}>
       <Navbar />
 
-      {/* ═══ HERO ═══ */}
+      {/* Hero */}
       <Box
+        ref={heroRef}
         sx={{
           position: 'relative',
           overflow: 'hidden',
-          pt: { xs: 20, md: 28 },
-          pb: { xs: 16, md: 24 },
           minHeight: '100vh',
           display: 'flex',
           alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
         <ParticleField />
         <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
-          <Stack spacing={3.5} sx={{ alignItems: 'center', textAlign: 'center' }}>
-            <Reveal>
-              <Chip
-                label="MIDNIGHT NETWORK • ZERO KNOWLEDGE"
-                size="small"
-                sx={{
-                  bgcolor: '#ffffff04',
-                  border: '1px solid #1a1a1f',
-                  color: '#52525b',
-                  fontWeight: 600,
-                  fontSize: '0.6rem',
-                  letterSpacing: '0.12em',
-                }}
-              />
-            </Reveal>
+          <Stack spacing={3} sx={{ alignItems: 'center', textAlign: 'center' }}>
+            <Chip
+              label="MIDNIGHT NETWORK • ZERO KNOWLEDGE"
+              size="small"
+              sx={{ bgcolor: '#ffffff04', border: '1px solid #1a1a1f', color: '#52525b', fontWeight: 600, fontSize: '0.6rem', letterSpacing: '0.12em' }}
+            />
 
-            <Reveal delay={0.12}>
+            <Box ref={titleRef} sx={{ opacity: 0 }}>
               <Typography
                 sx={{
                   fontWeight: 900,
                   letterSpacing: '-0.05em',
-                  fontSize: { xs: '3rem', sm: '4.2rem', md: '5.5rem' },
-                  lineHeight: 1.0,
+                  fontSize: { xs: '3rem', sm: '4.5rem', md: '6rem' },
+                  lineHeight: 0.95,
                   color: '#ffffff',
                 }}
               >
                 Confidential
               </Typography>
-            </Reveal>
+            </Box>
 
-            <Reveal delay={0.2}>
+            <Box ref={subtitleRef} sx={{ opacity: 0, mt: '-8px !important' }}>
               <Typography
                 sx={{
                   fontWeight: 900,
                   letterSpacing: '-0.05em',
-                  fontSize: { xs: '3rem', sm: '4.2rem', md: '5.5rem' },
-                  lineHeight: 1.0,
-                  color: '#27272a',
-                  mt: '-12px !important',
+                  fontSize: { xs: '3rem', sm: '4.5rem', md: '6rem' },
+                  lineHeight: 0.95,
+                  background: 'linear-gradient(180deg, #52525b 0%, #27272a 100%)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
                 }}
               >
                 Voting Engine
               </Typography>
-            </Reveal>
+            </Box>
 
-            <Reveal delay={0.3}>
-              <Typography
-                sx={{
-                  color: '#52525b',
-                  maxWidth: 460,
-                  fontSize: { xs: '0.95rem', md: '1.1rem' },
-                  lineHeight: 1.75,
-                }}
-              >
+            <Box ref={descRef} sx={{ opacity: 0 }}>
+              <Typography sx={{ color: '#52525b', maxWidth: 480, fontSize: '1.05rem', lineHeight: 1.75 }}>
                 Private ballots proven off-chain. Verifiable tallies on-chain.
                 No one sees your vote — everyone can verify the count.
               </Typography>
-            </Reveal>
+            </Box>
 
-            <Reveal delay={0.4}>
-              <Stack direction="row" spacing={2} sx={{ pt: 2 }}>
+            <Box ref={ctaRef} sx={{ opacity: 0, pt: 2 }}>
+              <Stack direction="row" spacing={2}>
                 <Button
                   variant="contained"
                   size="large"
                   endIcon={<ArrowForwardIcon />}
                   onClick={() => navigate('/app')}
-                  sx={{ px: 4, py: 1.5, fontSize: '0.95rem', fontWeight: 700, borderRadius: '12px' }}
+                  sx={{ px: 4, py: 1.5, fontSize: '1rem', fontWeight: 700, borderRadius: '14px' }}
                 >
                   Launch App
                 </Button>
@@ -116,27 +108,17 @@ const LandingPage: React.FC = () => {
                   variant="outlined"
                   size="large"
                   onClick={() => navigate('/features')}
-                  sx={{ px: 3.5, py: 1.5, borderColor: '#27272a', color: '#71717a', fontSize: '0.95rem', borderRadius: '12px' }}
+                  sx={{ px: 3.5, py: 1.5, borderColor: '#27272a', color: '#71717a', fontSize: '1rem', borderRadius: '14px' }}
                 >
                   Explore
                 </Button>
               </Stack>
-            </Reveal>
+            </Box>
           </Stack>
         </Container>
 
-        {/* Subtle gradient at bottom */}
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: 200,
-            background: 'linear-gradient(to top, #030304, transparent)',
-            pointerEvents: 'none',
-          }}
-        />
+        {/* Bottom fade */}
+        <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 200, background: 'linear-gradient(to top, #030304, transparent)', pointerEvents: 'none' }} />
       </Box>
     </Box>
   );

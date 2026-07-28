@@ -19,6 +19,8 @@ export default defineConfig({
       '@react-three/fiber': path.resolve(__dirname, '../node_modules/@react-three/fiber'),
       '@react-three/drei': path.resolve(__dirname, '../node_modules/@react-three/drei'),
       'framer-motion': path.resolve(__dirname, '../node_modules/framer-motion'),
+      'gsap': path.resolve(__dirname, '../node_modules/gsap'),
+      'lenis': path.resolve(__dirname, '../node_modules/lenis'),
     },
     extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.wasm'],
     mainFields: ['browser', 'module', 'main'],
