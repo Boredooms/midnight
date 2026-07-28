@@ -67,7 +67,7 @@ const ArchitecturePage: React.FC = () => {
       <Navbar />
 
       {/* Header */}
-      <Box ref={headerRef} sx={{ pt: { xs: 16, md: 22 }, pb: { xs: 4, md: 6 }, textAlign: 'center', opacity: 0 }}>
+      <Box ref={headerRef} sx={{ pt: { xs: 18, md: 24 }, pb: { xs: 4, md: 6 }, textAlign: 'center', opacity: 0 }}>
         <Container maxWidth="md">
           <Chip label="SYSTEM DESIGN" size="small" sx={{ mb: 3, bgcolor: '#ffffff04', border: '1px solid #1a1a1f', color: '#52525b', fontWeight: 600, fontSize: '0.6rem', letterSpacing: '0.12em' }} />
           <Typography sx={{ fontWeight: 800, fontSize: { xs: '2.2rem', md: '3.4rem' }, letterSpacing: '-0.04em', mb: 1.5 }}>
