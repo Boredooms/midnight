@@ -12,22 +12,32 @@ import { CONTRACT_ADDRESS } from '../globals';
 
 /**
  * The real, working dApp page — connects to actual Midnight Preprod contracts.
+ * Auto-joins the contract from VITE_CONTRACT_ADDRESS when wallet connects.
  */
 const AppPage: React.FC = () => {
   const votingManager = useDeployedVotingContext();
   const wallet = useWallet();
   const [deployments, setDeployments] = useState<Array<Observable<VotingDeployment>>>([]);
+  const [autoJoined, setAutoJoined] = useState(false);
 
   useEffect(() => {
     const sub = votingManager.deployments$.subscribe(setDeployments);
     return () => sub.unsubscribe();
   }, [votingManager]);
 
+  // Auto-join the default contract when wallet connects
+  useEffect(() => {
+    if (wallet.status === 'connected' && CONTRACT_ADDRESS && !autoJoined && deployments.length === 0) {
+      setAutoJoined(true);
+      votingManager.resolve(CONTRACT_ADDRESS as any);
+    }
+  }, [wallet.status, autoJoined, deployments.length, votingManager]);
+
   const handleDeployNew = () => votingManager.resolve();
   const handleJoinContract = (addr: string) => votingManager.resolve(addr as any);
   const handleRetryConnect = () => {
     if (wallet.status !== 'connected') void wallet.connect();
-    else votingManager.retry(CONTRACT_ADDRESS as any);
+    else if (CONTRACT_ADDRESS) votingManager.retry(CONTRACT_ADDRESS as any);
   };
 
   return (
