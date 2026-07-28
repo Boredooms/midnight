@@ -43,11 +43,11 @@ jobs:
 
       - name: Build API
         working-directory: api
-        run: npm run ci
+        run: npm run build
 
       - name: Build CLI
         working-directory: confidential-voting-cli
-        run: npm run ci
+        run: npm run build
 
       - name: Typecheck UI
         working-directory: confidential-voting-ui
