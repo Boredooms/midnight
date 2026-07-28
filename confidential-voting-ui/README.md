@@ -45,10 +45,12 @@ Privacy is achieved through:
 
 ## Deployed Contract
 
-- **Network:** Midnight Preprod
-- **Contract Address:** `0200dbf964f541e1950883f5b2f539b66fd6111e46ce8e6e9551fbdd180114d5`
+- **Network:** Midnight Preprod / Undeployed (local dev)
+- **Contract Address:** `ff4960ad66c533fc03ae116d182f2ca9782f149fa3d025eaeaffe23594c30942`
 - **Compiler:** Compact 0.31.1
 - **Runtime:** 0.16.0
+
+> Note: Each election is a separate contract deployment. The address above is the demo election used in testing. On preprod, contract addresses are permanent and verifiable on-chain.
 
 ## Prerequisites
 

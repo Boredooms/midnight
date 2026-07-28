@@ -8,7 +8,7 @@ Privacy-preserving voting DApp on the Midnight Network. Individual voter ballots
 |----------|-----|
 | **Live Demo** | [https://dist-pi-sandy-35.vercel.app](https://dist-pi-sandy-35.vercel.app) |
 | **Demo Video** | [docs/demo-video.mp4](docs/demo-video.mp4) |
-| **Contract Address (Preprod)** | `0200dbf964f541e1950883f5b2f539b66fd6111e46ce8e6e9551fbdd180114d5` |
+| **Contract Address** | `ff4960ad66c533fc03ae116d182f2ca9782f149fa3d025eaeaffe23594c30942` |
 
 ## Privacy Claim
 
