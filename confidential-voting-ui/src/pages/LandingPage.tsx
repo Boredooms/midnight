@@ -13,7 +13,6 @@ const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const heroRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
-  const subtitleRef = useRef<HTMLDivElement>(null);
   const descRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
 
@@ -22,7 +21,6 @@ const LandingPage: React.FC = () => {
       const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
 
       tl.fromTo(titleRef.current, { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 1.2 })
-        .fromTo(subtitleRef.current, { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 1 }, '-=0.8')
         .fromTo(descRef.current, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, '-=0.6')
         .fromTo(ctaRef.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, '-=0.4');
     }, heroRef);
@@ -67,9 +65,6 @@ const LandingPage: React.FC = () => {
               >
                 Confidential
               </Typography>
-            </Box>
-
-            <Box ref={subtitleRef} sx={{ opacity: 0 }}>
               <Typography
                 sx={{
                   fontWeight: 900,
