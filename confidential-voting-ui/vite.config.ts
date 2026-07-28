@@ -15,6 +15,10 @@ export default defineConfig({
     alias: {
       '@midnight-ntwrk/confidential-voting-api': path.resolve(__dirname, '../api/src'),
       '@midnight-ntwrk/confidential-voting-contract': path.resolve(__dirname, '../contract/src'),
+      'three': path.resolve(__dirname, '../node_modules/three'),
+      '@react-three/fiber': path.resolve(__dirname, '../node_modules/@react-three/fiber'),
+      '@react-three/drei': path.resolve(__dirname, '../node_modules/@react-three/drei'),
+      'framer-motion': path.resolve(__dirname, '../node_modules/framer-motion'),
     },
     extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.wasm'],
     mainFields: ['browser', 'module', 'main'],

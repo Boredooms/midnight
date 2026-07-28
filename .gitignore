@@ -62,3 +62,10 @@ managed/
 
 .claude
 .midnight-expert
+
+# Extra ones
+.kilocode/
+.kiro/
+nul
+.env.devnet
+.env.local

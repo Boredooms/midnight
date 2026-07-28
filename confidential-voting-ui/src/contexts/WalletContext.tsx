@@ -10,6 +10,7 @@ import {
   type InitialAPI,
   type ConnectedAPI,
 } from '@midnight-ntwrk/dapp-connector-api';
+import { WalletSelectDialog, type DetectedWallet } from '../components/WalletSelectDialog';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -18,6 +19,7 @@ import {
 export type WalletStatus =
   | 'idle'
   | 'detecting'
+  | 'selecting'
   | 'connecting'
   | 'connected'
   | 'error';
@@ -49,24 +51,30 @@ const WalletContext = createContext<WalletContextValue | undefined>(undefined);
 
 const NETWORK_ID = (import.meta.env.VITE_NETWORK_ID as string | undefined) ?? 'preprod';
 
-const detectWallet = (): InitialAPI | undefined => {
-  if (typeof window === 'undefined' || !window.midnight) return undefined;
-  const midObj = window.midnight as Record<string, unknown>;
+/**
+ * Discover all Midnight wallets injected into window.midnight.
+ * Per the DApp Connector API spec, wallets inject under various keys.
+ * Lace uses 'mnLace', 1AM uses UUID or '1am'.
+ * We enumerate everything and filter by valid shape.
+ */
+const listWallets = (): DetectedWallet[] => {
+  if (typeof window === 'undefined' || !window.midnight) return [];
+  const entries = Object.entries(window.midnight as Record<string, unknown>);
+  const wallets: DetectedWallet[] = [];
 
-  // Try common 1AM wallet key names
-  for (const key of ['mn_1am', '1am', '1am-wallet', 'midnight', 'MidnightWallet']) {
-    const candidate = midObj[key];
-    if (candidate && typeof candidate === 'object' && 'connect' in candidate) {
-      return candidate as InitialAPI;
+  for (const [key, candidate] of entries) {
+    if (
+      candidate &&
+      typeof candidate === 'object' &&
+      'apiVersion' in candidate &&
+      'connect' in candidate &&
+      typeof (candidate as any).connect === 'function'
+    ) {
+      wallets.push({ key, api: candidate as InitialAPI });
     }
   }
-  // Fallback: iterate all keys
-  for (const val of Object.values(midObj)) {
-    if (val && typeof val === 'object' && 'connect' in val) {
-      return val as InitialAPI;
-    }
-  }
-  return undefined;
+
+  return wallets;
 };
 
 // ---------------------------------------------------------------------------
@@ -84,45 +92,29 @@ export const WalletProvider: React.FC<PropsWithChildren> = ({ children }) => {
     connectedAPI: null,
   });
 
-  // Store connectedAPI in ref too so other code can access synchronously
+  const [showSelector, setShowSelector] = useState(false);
+  const [detectedWallets, setDetectedWallets] = useState<DetectedWallet[]>([]);
   const connectedAPIRef = useRef<ConnectedAPI | null>(null);
 
-  const connect = useCallback(async () => {
-    setState((s) => ({ ...s, status: 'detecting', errorMessage: null }));
-
-    // Poll for wallet injection (up to 5 seconds)
-    let wallet: InitialAPI | undefined;
-    for (let i = 0; i < 25; i++) {
-      wallet = detectWallet();
-      if (wallet) break;
-      await new Promise((r) => setTimeout(r, 200));
-    }
-
-    if (!wallet) {
-      setState((s) => ({
-        ...s,
-        status: 'error',
-        errorMessage:
-          '1AM Wallet extension not detected. Please install the 1AM Wallet extension and refresh the page.',
-      }));
-      return;
-    }
-
-    const walletName = wallet.name ?? '1AM Wallet';
-    setState((s) => ({ ...s, status: 'connecting', walletName }));
+  const connectToWallet = useCallback(async (wallet: InitialAPI, walletName: string) => {
+    setState((s) => ({ ...s, status: 'connecting', walletName, errorMessage: null }));
 
     try {
       const connectedAPI = await wallet.connect(NETWORK_ID);
       connectedAPIRef.current = connectedAPI;
 
-      const [connectionStatus, shieldedAddrs, dustBal] = await Promise.all([
-        connectedAPI.getConnectionStatus(),
+      // Validate connection status per DApp Connector API spec
+      const connectionStatus = await connectedAPI.getConnectionStatus();
+      if (connectionStatus.status !== 'connected') {
+        throw new Error('Wallet connection was not established. Please try again.');
+      }
+
+      const [shieldedAddrs, dustBal] = await Promise.all([
         connectedAPI.getShieldedAddresses().catch(() => null),
         connectedAPI.getDustBalance().catch(() => null),
       ]);
 
-      const netId =
-        connectionStatus.status === 'connected' ? connectionStatus.networkId : NETWORK_ID;
+      const netId = connectionStatus.networkId ?? NETWORK_ID;
 
       setState({
         status: 'connected',
@@ -134,7 +126,7 @@ export const WalletProvider: React.FC<PropsWithChildren> = ({ children }) => {
         connectedAPI,
       });
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to connect to 1AM Wallet';
+      const msg = err instanceof Error ? err.message : 'Failed to connect wallet';
       setState((s) => ({
         ...s,
         status: 'error',
@@ -144,6 +136,51 @@ export const WalletProvider: React.FC<PropsWithChildren> = ({ children }) => {
       }));
       connectedAPIRef.current = null;
     }
+  }, []);
+
+  const connect = useCallback(async () => {
+    setState((s) => ({ ...s, status: 'detecting', errorMessage: null }));
+
+    // Poll for wallet injection (up to 4 seconds)
+    let wallets: DetectedWallet[] = [];
+    for (let i = 0; i < 20; i++) {
+      wallets = listWallets();
+      if (wallets.length > 0) break;
+      await new Promise((r) => setTimeout(r, 200));
+    }
+
+    if (wallets.length === 0) {
+      setState((s) => ({
+        ...s,
+        status: 'error',
+        errorMessage:
+          'No Midnight wallet detected. Install the Lace or 1AM wallet extension and refresh the page.',
+      }));
+      return;
+    }
+
+    // If only one wallet, connect directly. If multiple, show selection dialog.
+    if (wallets.length === 1) {
+      const w = wallets[0];
+      await connectToWallet(w.api, w.api.name ?? 'Midnight Wallet');
+    } else {
+      setDetectedWallets(wallets);
+      setShowSelector(true);
+      setState((s) => ({ ...s, status: 'selecting' }));
+    }
+  }, [connectToWallet]);
+
+  const handleWalletSelect = useCallback(
+    (wallet: DetectedWallet) => {
+      setShowSelector(false);
+      void connectToWallet(wallet.api, wallet.api.name ?? 'Midnight Wallet');
+    },
+    [connectToWallet],
+  );
+
+  const handleSelectorClose = useCallback(() => {
+    setShowSelector(false);
+    setState((s) => (s.status === 'selecting' ? { ...s, status: 'idle' } : s));
   }, []);
 
   const disconnect = useCallback(() => {
@@ -162,6 +199,12 @@ export const WalletProvider: React.FC<PropsWithChildren> = ({ children }) => {
   return (
     <WalletContext.Provider value={{ ...state, connect, disconnect }}>
       {children}
+      <WalletSelectDialog
+        open={showSelector}
+        wallets={detectedWallets}
+        onSelect={handleWalletSelect}
+        onClose={handleSelectorClose}
+      />
     </WalletContext.Provider>
   );
 };

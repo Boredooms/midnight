@@ -11,7 +11,10 @@ export const formatContractAddress = (address: string): string => {
   if (cleaned.length > 64) {
     cleaned = cleaned.slice(0, 64);
   }
-  return cleaned;
+  return cleaned.toLowerCase();
 };
 
-export const CONTRACT_ADDRESS = '0200dbf964f541e1950883f5b2f539b66fd6111e46ce8e6e9551fbdd180114d5';
+/** Default demo contract address — configurable via VITE_CONTRACT_ADDRESS env var */
+export const CONTRACT_ADDRESS =
+  (import.meta.env.VITE_CONTRACT_ADDRESS as string | undefined) ??
+  '0200dbf964f541e1950883f5b2f539b66fd6111e46ce8e6e9551fbdd180114d5';

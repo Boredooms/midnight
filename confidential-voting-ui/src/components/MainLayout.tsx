@@ -6,9 +6,9 @@ export type MainLayoutProps = PropsWithChildren<HeaderProps>;
 
 export const MainLayout: React.FC<MainLayoutProps> = ({ children, onJoinContract, onDeployContract }) => {
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#08080c', color: '#fff' }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: '#030304' }}>
       <Header onJoinContract={onJoinContract} onDeployContract={onDeployContract} />
-      <Container maxWidth="lg" sx={{ pt: 4, pb: 8 }}>
+      <Container maxWidth="sm" sx={{ pt: 2, pb: 8 }}>
         {children}
       </Container>
     </Box>
