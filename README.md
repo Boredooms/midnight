@@ -6,11 +6,28 @@ Privacy-preserving voting DApp on the Midnight Network. Individual voter ballots
 
 | Resource | URL |
 |----------|-----|
-| **Live Demo** | [https://dist-pi-sandy-35.vercel.app](https://dist-pi-sandy-35.vercel.app) |
-| **Demo Video** | [docs/demo-video.mp4](docs/demo-video.mp4) |
+| **Live Demo** | [https://midnight-inky-seven.vercel.app](https://midnight-inky-seven.vercel.app) |
+| **Demo Video** | [Google Drive](https://drive.google.com/file/d/1Sy_zU8ESOT0saMXSukYuzGUrdcdXZ_-z/view?usp=sharing) |
 | **Contract Address** | `ff4960ad66c533fc03ae116d182f2ca9782f149fa3d025eaeaffe23594c30942` |
 | **Preprod Faucet** | [https://midnight-tmnight-preprod.nethermind.dev/](https://midnight-tmnight-preprod.nethermind.dev/) |
 | **Midnight Docs** | [https://docs.midnight.network](https://docs.midnight.network) |
+
+## Screenshots
+
+### Landing Page
+![Landing](docs/screenshots/landing.png)
+
+### Features
+![Features](docs/screenshots/features.png)
+
+### Architecture
+![Architecture](docs/screenshots/architecture.png)
+
+### Interactive Demo
+![Demo](docs/screenshots/demo.png)
+
+### Live App (Wallet Connected + Finalized Election)
+![App](docs/screenshots/app.png)
 
 ## Privacy Claim
 
@@ -20,7 +37,7 @@ The privacy mechanisms:
 - `voterSecretKey()` witness — secret key never leaves the client
 - `voterPublicKey()` — DApp-specific identity via `persistentHash`, unlinkable across elections
 - `computeNullifier()` — prevents double-voting without linking to voter identity
-- `disclose(candidateIndex)` — proves choice is valid (0 or 1) but the ZK circuit ensures it's computed correctly without revealing the mapping to the voter
+- Vote choice proven valid in-circuit without revealing the mapping
 - `Winner` enum — results published on-chain transparently after finalization
 
 ## Smart Contract
@@ -59,8 +76,7 @@ midnight/demo/
 │   ├── src/contexts/                 # Wallet + Voting deployment managers
 │   ├── public/keys/                  # ZK prover/verifier keys
 │   └── public/zkir/                  # Compiled ZK intermediate representation
-├── docs/
-│   └── demo-video.mp4               # Demo: wallet connect + circuit call
+├── docs/screenshots/                 # App screenshots
 └── .github/workflows/ci.yaml        # CI pipeline
 ```
 
@@ -69,7 +85,7 @@ midnight/demo/
 - ✅ **Wallet connect/disconnect** — Lace + 1AM with selection dialog (DApp Connector API v4)
 - ✅ **Circuit called from frontend** — `createElection`, `vote`, `finalizeElection`, `ownerFinalizeElection`
 - ✅ **Observable privacy behavior** — vote choice proven without being shown (ZK nullifier)
-- ✅ **Contract deployed with verifiable address** — `ff4960ad...e4434e9a`
+- ✅ **Contract deployed with verifiable address** — `ff4960ad...c30942`
 - ✅ **8+ meaningful commits** — see git log
 
 ## Quick Start
@@ -79,7 +95,7 @@ midnight/demo/
 - Node.js 22+
 - Lace or 1AM wallet extension (Chrome)
 
-### Option A: Local Development (Recommended)
+### Local Development
 
 ```bash
 # 1. Start local Midnight network (node + indexer + proof server)
@@ -87,15 +103,15 @@ git clone https://github.com/midnightntwrk/midnight-local-dev.git
 cd midnight-local-dev && npm install && npm start
 # Fund your wallet via the interactive menu
 
-# 2. In another terminal — run the UI
+# 2. Run the UI
 cd confidential-voting-ui
 npm install
-npm run dev  # or: npx vite --mode devnet
+npx vite --mode devnet
 
 # 3. Set Lace to "Undeployed" network, open http://localhost:5173
 ```
 
-### Option B: Preprod Network
+### Preprod Network
 
 ```bash
 # 1. Start proof server
@@ -105,13 +121,8 @@ docker run -d -p 6300:6300 midnightntwrk/proof-server:8.0.3 midnight-proof-serve
 
 # 3. Run the UI
 cd confidential-voting-ui
-npm run dev  # uses .env.preprod by default
+npm run dev
 ```
-
-### Faucet & DUST
-- **Preprod faucet:** [https://midnight-tmnight-preprod.nethermind.dev/](https://midnight-tmnight-preprod.nethermind.dev/)
-- After receiving tNIGHT, register for DUST generation in your wallet
-- DUST generates continuously from registered NIGHT (takes ~1-2 min on preprod, ~5 min locally)
 
 ## Tech Stack
 
@@ -119,16 +130,7 @@ npm run dev  # uses .env.preprod by default
 - **Frontend:** React 19, MUI 9, Three.js, GSAP, Lenis, Framer Motion
 - **Blockchain:** Midnight.js SDK 4.1.1, DApp Connector API v4
 - **Proving:** midnightntwrk/proof-server:8.0.3
-- **Deploy:** Vercel (static SPA)
-
-## Wallet Support
-
-| Wallet | Key | Proving | Status |
-|--------|-----|---------|--------|
-| **Lace** | `window.midnight.mnLace` | Local proof server (6300) | ✅ Tested |
-| **1AM** | UUID key | In-browser WASM | ✅ Supported |
-
-Multi-wallet: when both are detected, a selection dialog appears.
+- **Deploy:** Vercel
 
 ## License
 
