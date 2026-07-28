@@ -54,7 +54,10 @@ export class VotingSimulator {
     return this.circuitContext.currentPrivateState;
   }
 
-  public createElection(title: string, durationSeconds: bigint = 3600n): Ledger {
+  public createElection(
+    title: string,
+    durationSeconds: bigint = 3600n,
+  ): Ledger {
     this.circuitContext = this.contract.impureCircuits.createElection(
       this.circuitContext,
       title,
