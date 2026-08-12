@@ -41,7 +41,7 @@
   "devDependencies": {
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
-    "@swc/core": "^1.15.41",
+    "@swc/core": "^1.15.47",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "@types/three": "^0.185.1",
