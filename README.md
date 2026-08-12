@@ -1,136 +1,155 @@
-# Midnight Confidential Voting — Rise in Level 1 Challenge
+# Midnight Confidential Voting
 
-Privacy-preserving voting DApp on the Midnight Network. Individual voter ballots are proven off-chain via Compact ZK circuits — tallies are publicly verifiable on-chain.
+![CI](https://github.com/Boredooms/midnight/actions/workflows/ci.yaml/badge.svg)
 
-## Links
+> Privacy-preserving decentralized voting on the Midnight Network — anonymous ballots, publicly verifiable tallies.
 
-| Resource | URL |
-|----------|-----|
-| **Live Demo** | [https://midnight-inky-seven.vercel.app](https://midnight-inky-seven.vercel.app) |
-| **Demo Video** | [Google Drive](https://drive.google.com/file/d/1Sy_zU8ESOT0saMXSukYuzGUrdcdXZ_-z/view?usp=sharing) |
-| **Contract Address** | `ff4960ad66c533fc03ae116d182f2ca9782f149fa3d025eaeaffe23594c30942` |
-| **Preprod Faucet** | [https://midnight-tmnight-preprod.nethermind.dev/](https://midnight-tmnight-preprod.nethermind.dev/) |
-| **Midnight Docs** | [https://docs.midnight.network](https://docs.midnight.network) |
+## Live Demo
+
+[https://midnight-inky-seven.vercel.app](https://midnight-inky-seven.vercel.app)
 
 ## Screenshots
 
-### Landing Page
-![Landing](docs/screenshots/landing.png)
+| Page | Preview |
+|------|---------|
+| Landing | ![Landing](docs/screenshots/landing.png) |
+| Features | ![Features](docs/screenshots/features.png) |
+| Architecture | ![Architecture](docs/screenshots/Architechture.png) |
+| Demo | ![Demo](docs/screenshots/Demo.png) |
+| Main dApp | ![App](docs/screenshots/main%20dapp.png) |
+| Test Suite | ![Tests](docs/screenshots/test_suite.png) |
+| Tests Passing | ![Terminal](docs/screenshots/tests_passing.png) |
 
-### Features
-![Features](docs/screenshots/features.png)
+## Contract Address
 
-### Architecture
-![Architecture](docs/screenshots/architecture.png)
+| Network | Address |
+|---------|---------|
+| Preview | [`79bda166f07754080384f07744c742033cabff15f3ba428433e25d413cf2bb8b`](https://preview.midnightexplorer.com/contracts/0x79bda166f07754080384f07744c742033cabff15f3ba428433e25d413cf2bb8b) |
 
-### Interactive Demo
-![Demo](docs/screenshots/demo.png)
+## What This Does
 
-### Live App (Wallet Connected + Finalized Election)
-![App](docs/screenshots/app.png)
+A confidential voting DApp where:
+- An election owner deploys a ballot with a title and deadline
+- Voters cast private ballots — their choice (candidate 0 or 1) is proven valid in a ZK circuit without ever being revealed
+- Nullifiers prevent double-voting without linking to voter identity
+- Anyone can finalize the election after the deadline (decentralized — no owner needed)
+- Final tallies and winner are published on-chain transparently
+
+## Privacy Model
+
+- **PUBLIC:** Election title, deadline, total votes, per-candidate tallies, winner, election state, DApp-specific public keys, vote nullifiers
+- **PRIVATE:** Voter's secret key, voter's actual choice, voter's real identity
+- **PROVED without revealing:** Vote validity (choice is 0 or 1), voter uniqueness (hasn't voted before), owner identity (for emergency finalize)
 
 ## Privacy Claim
 
-**Individual votes are private.** Each voter's ballot is proven off-chain via a ZK proof generated locally. The proof demonstrates that the voter made a valid selection (candidate 0 or 1) without revealing which candidate was chosen. Only aggregate tally counters are public on-chain — individual vote choices never appear on the ledger.
+**What an on-chain observer sees:**
+- Aggregate tallies increment (candidate0Tally: 5, candidate1Tally: 3)
+- A nullifier was added to the set (proves someone voted, but unlinkable to identity)
+- The election was finalized with a winner
 
-The privacy mechanisms:
-- `voterSecretKey()` witness — secret key never leaves the client
-- `voterPublicKey()` — DApp-specific identity via `persistentHash`, unlinkable across elections
-- `computeNullifier()` — prevents double-voting without linking to voter identity
-- Vote choice proven valid in-circuit without revealing the mapping
-- `Winner` enum — results published on-chain transparently after finalization
+**What an on-chain observer CANNOT see:**
+- Which candidate any specific voter chose
+- Who cast any specific vote (nullifiers are derived from secret key + sequence — no address linkage)
+- The voter's secret key (never leaves their local machine)
+- Any connection between a voter's identity across different elections (public keys are election-specific via `persistentHash`)
 
-## Smart Contract
+## Tech Stack
 
-Written in Midnight's Compact language (`contract/src/confidential-voting.compact`):
+| Layer | Technology |
+|-------|-----------|
+| Smart Contract | Compact 0.23 (Midnight's ZK DSL) |
+| Frontend | React 19, MUI 9, Framer Motion, Three.js, GSAP |
+| Blockchain SDK | Midnight.js 4.1.1, DApp Connector API v4 |
+| Proof Server | `midnightntwrk/proof-server:8.1.0` (Docker) |
+| Testing | Vitest 4.x, compact-runtime simulator |
+| CI/CD | GitHub Actions |
+| Deploy | Vercel |
 
-| Circuit | Description | Privacy |
-|---------|-------------|---------|
-| `createElection(title, duration)` | Initialize election with deadline | Owner ZK identity |
-| `vote(candidateIndex)` | Cast vote with nullifier | Choice proven valid without revealing it |
-| `finalizeElection()` | Anyone can finalize after deadline | Decentralized — no owner needed |
-| `ownerFinalizeElection()` | Emergency override | Owner ZK proof required |
+## Prerequisites
 
-**Ledger state:**
-- `state`: Enum (UNINITIALIZED, OPEN, FINALIZED)
-- `electionTitle`: Maybe<string>
-- `candidate0Tally`, `candidate1Tally`, `totalVotes`: Counters
-- `deadline`: Uint<64> (block time)
-- `winner`: Enum (NONE, CANDIDATE_A, CANDIDATE_B, TIE)
-- `nullifierSet`: Set<Bytes<32>> (double-vote prevention)
-- `owner`: Bytes<32> (ZK identity)
+- Node.js v22+
+- Docker Desktop (for the proof server)
+- Lace or 1AM wallet extension (Chrome)
 
-Compiled with Compact compiler v0.31.1, runtime v0.16.0.
+## Setup & Run Locally
+
+```bash
+# Clone the repo
+git clone https://github.com/Boredooms/midnight.git
+cd midnight
+
+# Install dependencies
+npm install --legacy-peer-deps
+
+# Start the proof server (required for all networks)
+cd confidential-voting-ui
+docker compose up -d
+# Verify: curl http://localhost:6300/version → "8.1.0"
+
+# Run the frontend (preview network)
+npm run dev:preview
+# Opens at http://localhost:5173
+
+# Or for local dev (requires midnight-local-dev running):
+npm run dev:local
+```
+
+### Wallet Setup (Preview Network)
+
+1. Install [Lace wallet](https://www.lace.io/) extension
+2. Switch to **Preview** network in Lace settings
+3. Fund wallet from [Preview faucet](https://midnight-tmnight-preview.nethermind.dev/)
+4. Register for DUST generation
+5. Connect wallet in the DApp and interact with the election
+
+## Run Tests
+
+```bash
+cd contract
+npx vitest run
+```
+
+**20 tests** covering:
+- Circuit logic (createElection, vote, finalize correctness)
+- State transitions (UNINITIALIZED → OPEN → FINALIZED)
+- Privacy (secret key never leaks, nullifiers unlinkable)
+- Double-vote prevention
+- Access control (owner-only emergency finalize)
+
+## CI/CD
+
+The GitHub Actions pipeline (`.github/workflows/ci.yaml`) runs on every push to `main` and on pull requests:
+
+1. **Contract job:** Compile Compact → typecheck → lint → build → run 20 unit tests
+2. **API job:** Build the TypeScript API layer
+3. **UI job:** Typecheck + production build of the React frontend
+4. **CLI job:** Build the deployment CLI
+
+All jobs run in parallel where possible (API, UI, CLI depend on contract artifacts).
 
 ## Project Structure
 
 ```
-midnight/demo/
 ├── contract/                         # Compact smart contract
-│   └── src/confidential-voting.compact
-├── api/                              # TypeScript API layer (VotingAPI class)
-├── confidential-voting-cli/          # CLI for contract deployment
+│   ├── src/confidential-voting.compact
+│   └── src/test/confidential-voting.test.ts  ← 20 tests
+├── api/                              # TypeScript API (VotingAPI class)
+├── confidential-voting-cli/          # CLI for deployment
 ├── confidential-voting-ui/           # React frontend
-│   ├── src/pages/                    # Landing, Features, Architecture, Demo, App
-│   ├── src/components/               # Navbar, VotingCard, ParticleField, WalletSelect
-│   ├── src/contexts/                 # Wallet + Voting deployment managers
-│   ├── public/keys/                  # ZK prover/verifier keys
-│   └── public/zkir/                  # Compiled ZK intermediate representation
-├── docs/screenshots/                 # App screenshots
-└── .github/workflows/ci.yaml        # CI pipeline
+│   ├── src/config/networks.ts        # Multi-network config
+│   ├── src/contexts/                 # Wallet + Voting + Network contexts
+│   ├── src/components/NetworkSwitcher.tsx
+│   ├── docker-compose.yml            # Proof server
+│   └── public/keys/ & zkir/          # ZK proving artifacts
+├── .github/workflows/ci.yaml         # CI/CD pipeline
+├── PROPOSAL.md                       # Product proposal
+└── README.md
 ```
 
-## Requirements Met (Level 1)
+## Product Proposal
 
-- ✅ **Wallet connect/disconnect** — Lace + 1AM with selection dialog (DApp Connector API v4)
-- ✅ **Circuit called from frontend** — `createElection`, `vote`, `finalizeElection`, `ownerFinalizeElection`
-- ✅ **Observable privacy behavior** — vote choice proven without being shown (ZK nullifier)
-- ✅ **Contract deployed with verifiable address** — `ff4960ad...c30942`
-- ✅ **8+ meaningful commits** — see git log
-
-## Quick Start
-
-### Prerequisites
-- Docker Desktop
-- Node.js 22+
-- Lace or 1AM wallet extension (Chrome)
-
-### Local Development
-
-```bash
-# 1. Start local Midnight network (node + indexer + proof server)
-git clone https://github.com/midnightntwrk/midnight-local-dev.git
-cd midnight-local-dev && npm install && npm start
-# Fund your wallet via the interactive menu
-
-# 2. Run the UI
-cd confidential-voting-ui
-npm install
-npx vite --mode devnet
-
-# 3. Set Lace to "Undeployed" network, open http://localhost:5173
-```
-
-### Preprod Network
-
-```bash
-# 1. Start proof server
-docker run -d -p 6300:6300 midnightntwrk/proof-server:8.0.3 midnight-proof-server --network preprod
-
-# 2. Configure Lace for Preprod, get tNIGHT from faucet, generate DUST
-
-# 3. Run the UI
-cd confidential-voting-ui
-npm run dev
-```
-
-## Tech Stack
-
-- **Contract:** Compact 0.23 (Midnight's ZK DSL)
-- **Frontend:** React 19, MUI 9, Three.js, GSAP, Lenis, Framer Motion
-- **Blockchain:** Midnight.js SDK 4.1.1, DApp Connector API v4
-- **Proving:** midnightntwrk/proof-server:8.0.3
-- **Deploy:** Vercel
+See [PROPOSAL.md](./PROPOSAL.md)
 
 ## License
 

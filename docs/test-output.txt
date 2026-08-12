@@ -1,0 +1,32 @@
+npm notice run @midnight-ntwrk/confidential-voting@0.1.0 npx
+npm notice run 'vitest' run --reporter=verbose
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.10 [39m[90m/home/devara/midnight_me/demo/contract[39m
+
+Sourcemap for "/home/devara/midnight_me/demo/contract/src/managed/confidential-voting/contract/index.js" points to missing source files
+ [32m✓[39m src/test/confidential-voting.test.ts[2m > [22mConfidential Voting Contract[2m > [22mCircuit Logic[2m > [22mshould create an election with correct title and duration[32m 62[2mms[22m[39m
+ [32m✓[39m src/test/confidential-voting.test.ts[2m > [22mConfidential Voting Contract[2m > [22mCircuit Logic[2m > [22mshould correctly tally votes for candidate 0[32m 49[2mms[22m[39m
+ [32m✓[39m src/test/confidential-voting.test.ts[2m > [22mConfidential Voting Contract[2m > [22mCircuit Logic[2m > [22mshould correctly tally votes for candidate 1[32m 38[2mms[22m[39m
+ [32m✓[39m src/test/confidential-voting.test.ts[2m > [22mConfidential Voting Contract[2m > [22mCircuit Logic[2m > [22mshould correctly determine winner when candidate A leads[32m 77[2mms[22m[39m
+ [32m✓[39m src/test/confidential-voting.test.ts[2m > [22mConfidential Voting Contract[2m > [22mCircuit Logic[2m > [22mshould correctly determine TIE when tallies are equal[32m 61[2mms[22m[39m
+ [32m✓[39m src/test/confidential-voting.test.ts[2m > [22mConfidential Voting Contract[2m > [22mState Transitions[2m > [22mshould start in UNINITIALIZED state[32m 19[2mms[22m[39m
+ [32m✓[39m src/test/confidential-voting.test.ts[2m > [22mConfidential Voting Contract[2m > [22mState Transitions[2m > [22mshould transition from UNINITIALIZED → OPEN on createElection[32m 36[2mms[22m[39m
+ [32m✓[39m src/test/confidential-voting.test.ts[2m > [22mConfidential Voting Contract[2m > [22mState Transitions[2m > [22mshould transition from OPEN → FINALIZED on finalizeElection[32m 34[2mms[22m[39m
+ [32m✓[39m src/test/confidential-voting.test.ts[2m > [22mConfidential Voting Contract[2m > [22mState Transitions[2m > [22mshould reject createElection when already initialized[32m 25[2mms[22m[39m
+ [32m✓[39m src/test/confidential-voting.test.ts[2m > [22mConfidential Voting Contract[2m > [22mState Transitions[2m > [22mshould reject vote when election is not OPEN[32m 18[2mms[22m[39m
+ [32m✓[39m src/test/confidential-voting.test.ts[2m > [22mConfidential Voting Contract[2m > [22mState Transitions[2m > [22mshould reject finalizeElection when not OPEN[32m 21[2mms[22m[39m
+ [32m✓[39m src/test/confidential-voting.test.ts[2m > [22mConfidential Voting Contract[2m > [22mState Transitions[2m > [22mshould increment sequence counter after finalization[32m 49[2mms[22m[39m
+ [32m✓[39m src/test/confidential-voting.test.ts[2m > [22mConfidential Voting Contract[2m > [22mPrivacy[2m > [22mshould never expose voter secret key in ledger state[32m 43[2mms[22m[39m
+ [32m✓[39m src/test/confidential-voting.test.ts[2m > [22mConfidential Voting Contract[2m > [22mPrivacy[2m > [22mshould produce different public keys for same secret in different elections[32m 78[2mms[22m[39m
+ [32m✓[39m src/test/confidential-voting.test.ts[2m > [22mConfidential Voting Contract[2m > [22mPrivacy[2m > [22mshould not reveal vote choice in any public ledger field[32m 31[2mms[22m[39m
+ [32m✓[39m src/test/confidential-voting.test.ts[2m > [22mConfidential Voting Contract[2m > [22mDouble-Vote Prevention[2m > [22mshould reject a second vote from the same voter[32m 37[2mms[22m[39m
+ [32m✓[39m src/test/confidential-voting.test.ts[2m > [22mConfidential Voting Contract[2m > [22mDouble-Vote Prevention[2m > [22mshould allow different voters to vote in the same election[32m 46[2mms[22m[39m
+ [32m✓[39m src/test/confidential-voting.test.ts[2m > [22mConfidential Voting Contract[2m > [22mAccess Control[2m > [22mshould allow owner to emergency-finalize before deadline[32m 41[2mms[22m[39m
+ [32m✓[39m src/test/confidential-voting.test.ts[2m > [22mConfidential Voting Contract[2m > [22mAccess Control[2m > [22mshould reject non-owner from calling ownerFinalizeElection[32m 34[2mms[22m[39m
+ [32m✓[39m src/test/confidential-voting.test.ts[2m > [22mConfidential Voting Contract[2m > [22mAccess Control[2m > [22mshould reject invalid candidate index[32m 32[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m20 passed[39m[22m[90m (20)[39m
+[2m   Start at [22m 18:31:23
+[2m   Duration [22m 1.15s[2m (transform 115ms, setup 0ms, import 178ms, tests 835ms, environment 0ms)[22m
+
