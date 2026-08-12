@@ -7,6 +7,8 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { useNavigate } from 'react-router-dom';
 import { Navbar } from '../components/Navbar';
+import { ShaderBackground, SHADER_PALETTES } from '../components/ShaderBackground';
+import PillNav from '../components/PillNav';
 
 const Reveal: React.FC<{ children: React.ReactNode; delay?: number }> = ({ children, delay = 0 }) => {
   const ref = useRef(null);
@@ -62,21 +64,23 @@ const DemoPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ bgcolor: '#030304', minHeight: '100vh' }}>
-      <Navbar />
+    <Box sx={{ bgcolor: '#030304', minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
+      <ShaderBackground colors={SHADER_PALETTES.ember} speed={0.28} intensity={0.45} style={{ position: 'fixed' }} />
+      <Box sx={{ position: 'relative', zIndex: 1 }}>
+      <PillNav baseColor="#ffffff" pillColor="#1c0a00" pillTextColor="#e4e4e7" hoverTextColor="#ffffff" />
 
       <Box sx={{ pt: { xs: 16, md: 20 }, pb: { xs: 4, md: 6 }, textAlign: 'center' }}>
         <Container maxWidth="sm">
           <Reveal>
-            <Chip label="INTERACTIVE DEMO" size="small" sx={{ mb: 3, bgcolor: '#ffffff04', border: '1px solid #1a1a1f', color: '#52525b', fontWeight: 600, fontSize: '0.6rem', letterSpacing: '0.12em' }} />
+            <Chip label="INTERACTIVE DEMO" size="small" sx={{ mb: 3, bgcolor: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)', color: '#d4d4d8', fontWeight: 600, fontSize: '0.6rem', letterSpacing: '0.12em' }} />
           </Reveal>
           <Reveal delay={0.1}>
-            <Typography sx={{ fontWeight: 800, fontSize: { xs: '2rem', md: '2.6rem' }, letterSpacing: '-0.04em', mb: 1.5 }}>
+            <Typography sx={{ fontWeight: 800, fontSize: { xs: '2rem', md: '2.6rem' }, letterSpacing: '-0.04em', mb: 1.5, color: '#f4f4f5' }}>
               Try the Flow
             </Typography>
           </Reveal>
           <Reveal delay={0.15}>
-            <Typography sx={{ color: '#52525b', maxWidth: 400, mx: 'auto', mb: 2 }}>
+            <Typography sx={{ color: '#e4e4e7', maxWidth: 400, mx: 'auto', mb: 2 }}>
               Simulate the full election lifecycle. No wallet needed — this is a local mock.
             </Typography>
           </Reveal>
@@ -100,9 +104,11 @@ const DemoPage: React.FC = () => {
           <Box
             sx={{
               p: { xs: 3, md: 4 },
-              borderRadius: '16px',
-              border: '1px solid #18181b',
-              bgcolor: '#09090c',
+              borderRadius: '20px',
+              border: '1px solid rgba(255,255,255,0.1)',
+              bgcolor: 'rgba(9, 9, 12, 0.8)',
+              backdropFilter: 'blur(16px)',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
             }}
           >
             {/* Header */}
@@ -203,6 +209,7 @@ const DemoPage: React.FC = () => {
           </Box>
         </Reveal>
       </Container>
+      </Box>
     </Box>
   );
 };

@@ -3,6 +3,8 @@ import { Box, Typography, Container, Stack, Chip, Grid } from '@mui/material';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Navbar } from '../components/Navbar';
+import { ShaderBackground, SHADER_PALETTES } from '../components/ShaderBackground';
+import PillNav from '../components/PillNav';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -63,17 +65,19 @@ const ArchitecturePage: React.FC = () => {
   }, []);
 
   return (
-    <Box sx={{ bgcolor: '#030304', minHeight: '100vh' }}>
-      <Navbar />
+    <Box sx={{ bgcolor: '#030304', minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
+      <ShaderBackground colors={SHADER_PALETTES.mono} speed={0.2} intensity={0.35} style={{ position: 'fixed' }} />
+      <Box sx={{ position: 'relative', zIndex: 1 }}>
+      <PillNav baseColor="#ffffff" pillColor="#0a0a0c" pillTextColor="#d4d4d8" hoverTextColor="#ffffff" />
 
       {/* Header */}
       <Box ref={headerRef} sx={{ pt: { xs: 18, md: 24 }, pb: { xs: 4, md: 6 }, textAlign: 'center', opacity: 0 }}>
         <Container maxWidth="md">
-          <Chip label="SYSTEM DESIGN" size="small" sx={{ mb: 3, bgcolor: '#ffffff04', border: '1px solid #1a1a1f', color: '#52525b', fontWeight: 600, fontSize: '0.6rem', letterSpacing: '0.12em' }} />
-          <Typography sx={{ fontWeight: 800, fontSize: { xs: '2.2rem', md: '3.4rem' }, letterSpacing: '-0.04em', mb: 1.5 }}>
+          <Chip label="SYSTEM DESIGN" size="small" sx={{ mb: 3, bgcolor: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)', color: '#d4d4d8', fontWeight: 600, fontSize: '0.6rem', letterSpacing: '0.12em' }} />
+          <Typography sx={{ fontWeight: 800, fontSize: { xs: '2.2rem', md: '3.4rem' }, letterSpacing: '-0.04em', mb: 1.5, color: '#f4f4f5' }}>
             Architecture
           </Typography>
-          <Typography sx={{ color: '#52525b', maxWidth: 500, mx: 'auto', lineHeight: 1.7 }}>
+          <Typography sx={{ color: '#a1a1aa', maxWidth: 500, mx: 'auto', lineHeight: 1.7 }}>
             Three-layer system: client-side privacy, local proof generation, on-chain verification.
           </Typography>
         </Container>
@@ -108,16 +112,24 @@ const ArchitecturePage: React.FC = () => {
               <Grid size={{ xs: 12, sm: 6 }} key={item.name}>
                 <Box
                   sx={{
-                    p: 3, borderRadius: '12px', border: '1px solid #18181b', bgcolor: '#09090c',
-                    height: '100%', borderLeft: `3px solid ${LAYERS[activeLayer].color}25`,
-                    transition: 'border-color 0.2s ease',
-                    '&:hover': { borderColor: '#27272a' },
+                    p: 3, borderRadius: '16px',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    bgcolor: 'rgba(9, 9, 12, 0.75)',
+                    backdropFilter: 'blur(12px)',
+                    height: '100%',
+                    borderLeft: `3px solid ${LAYERS[activeLayer].color}40`,
+                    transition: 'border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease',
+                    '&:hover': {
+                      borderColor: 'rgba(255,255,255,0.15)',
+                      transform: 'translateY(-3px)',
+                      boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
+                    },
                   }}
                 >
-                  <Typography sx={{ fontWeight: 700, fontSize: '0.85rem', mb: 0.75, color: LAYERS[activeLayer].color }}>
+                  <Typography sx={{ fontWeight: 700, fontSize: '0.9rem', mb: 0.75, color: LAYERS[activeLayer].color }}>
                     {item.name}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: '#71717a', lineHeight: 1.65, fontSize: '0.8rem' }}>
+                  <Typography variant="body2" sx={{ color: '#a1a1aa', lineHeight: 1.7, fontSize: '0.82rem' }}>
                     {item.desc}
                   </Typography>
                 </Box>
@@ -128,12 +140,12 @@ const ArchitecturePage: React.FC = () => {
       </Box>
 
       {/* Contract Schema */}
-      <Box ref={schemaRef} sx={{ py: { xs: 8, md: 12 }, borderTop: '1px solid #0f0f12', opacity: 0 }}>
+      <Box ref={schemaRef} sx={{ py: { xs: 8, md: 12 }, borderTop: '1px solid rgba(255,255,255,0.05)', opacity: 0 }}>
         <Container maxWidth="sm">
-          <Typography sx={{ fontWeight: 700, fontSize: '1.3rem', letterSpacing: '-0.02em', mb: 4, textAlign: 'center' }}>
+          <Typography sx={{ fontWeight: 700, fontSize: '1.3rem', letterSpacing: '-0.02em', mb: 4, textAlign: 'center', color: '#f4f4f5' }}>
             Contract Schema
           </Typography>
-          <Box sx={{ p: 3.5, borderRadius: '14px', border: '1px solid #18181b', bgcolor: '#09090c', fontFamily: '"JetBrains Mono", "Fira Code", monospace', fontSize: '0.76rem', lineHeight: 2.2, color: '#a1a1aa', overflowX: 'auto' }}>
+          <Box sx={{ p: 3.5, borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)', bgcolor: 'rgba(9,9,12,0.8)', backdropFilter: 'blur(12px)', fontFamily: '"JetBrains Mono", "Fira Code", monospace', fontSize: '0.76rem', lineHeight: 2.2, color: '#d4d4d8', overflowX: 'auto' }}>
             <Box component="span" sx={{ color: '#52525b' }}>{'// Compact contract — confidential-voting.compact'}</Box><br />
             <Box component="span" sx={{ color: '#34d399' }}>enum</Box> State {'{'} UNINITIALIZED, OPEN, FINALIZED {'}'}<br />
             <Box component="span" sx={{ color: '#34d399' }}>enum</Box> Winner {'{'} NONE, CANDIDATE_A, CANDIDATE_B, TIE {'}'}<br /><br />
@@ -152,6 +164,7 @@ const ArchitecturePage: React.FC = () => {
             <Box component="span" sx={{ color: '#34d399' }}>circuit</Box> <Box component="span" sx={{ color: '#fff' }}>ownerFinalizeElection</Box>() → owner emergency
           </Box>
         </Container>
+      </Box>
       </Box>
     </Box>
   );
