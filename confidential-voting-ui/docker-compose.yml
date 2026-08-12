@@ -1,0 +1,25 @@
+# Midnight Proof Server for local development.
+# The proof server generates ZK proofs locally — it handles private data and
+# must ALWAYS run on your machine regardless of which network you target.
+#
+# Usage:
+#   docker compose up -d          # start
+#   docker compose ps             # verify running
+#   docker compose logs -f        # view logs
+#   docker compose down           # stop
+#
+# Health check:
+#   curl http://localhost:6300/health
+#
+# Image version: 8.1.0 — matches ledger v8.1.0 (latest stable, May 2026)
+# See: https://docs.midnight.network/relnotes/support-matrix
+
+services:
+  proof-server:
+    image: midnightntwrk/proof-server:8.1.0
+    container_name: midnight-proof-server
+    ports:
+      - "6300:6300"
+    environment:
+      RUST_BACKTRACE: "full"
+    restart: unless-stopped
