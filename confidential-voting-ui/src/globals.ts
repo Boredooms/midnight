@@ -17,4 +17,4 @@ export const formatContractAddress = (address: string): string => {
 /** Default demo contract address — configurable via VITE_CONTRACT_ADDRESS env var */
 export const CONTRACT_ADDRESS =
   (import.meta.env.VITE_CONTRACT_ADDRESS as string | undefined) ??
-  '0200dbf964f541e1950883f5b2f539b66fd6111e46ce8e6e9551fbdd180114d5';
+  '79bda166f07754080384f07744c742033cabff15f3ba428433e25d413cf2bb8b';
