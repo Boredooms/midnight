@@ -11,6 +11,7 @@ import {
   type ConnectedAPI,
 } from '@midnight-ntwrk/dapp-connector-api';
 import { WalletSelectDialog, type DetectedWallet } from '../components/WalletSelectDialog';
+import { useNetwork } from './NetworkContext';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -49,8 +50,6 @@ const WalletContext = createContext<WalletContextValue | undefined>(undefined);
 // Helpers
 // ---------------------------------------------------------------------------
 
-const NETWORK_ID = (import.meta.env.VITE_NETWORK_ID as string | undefined) ?? 'preprod';
-
 /**
  * Discover all Midnight wallets injected into window.midnight.
  * Per the DApp Connector API spec, wallets inject under various keys.
@@ -82,6 +81,8 @@ const listWallets = (): DetectedWallet[] => {
 // ---------------------------------------------------------------------------
 
 export const WalletProvider: React.FC<PropsWithChildren> = ({ children }) => {
+  const { network } = useNetwork();
+
   const [state, setState] = useState<WalletState>({
     status: 'idle',
     walletName: null,
@@ -100,7 +101,7 @@ export const WalletProvider: React.FC<PropsWithChildren> = ({ children }) => {
     setState((s) => ({ ...s, status: 'connecting', walletName, errorMessage: null }));
 
     try {
-      const connectedAPI = await wallet.connect(NETWORK_ID);
+      const connectedAPI = await wallet.connect(network.networkId);
       connectedAPIRef.current = connectedAPI;
 
       // Validate connection status per DApp Connector API spec
@@ -114,7 +115,7 @@ export const WalletProvider: React.FC<PropsWithChildren> = ({ children }) => {
         connectedAPI.getDustBalance().catch(() => null),
       ]);
 
-      const netId = connectionStatus.networkId ?? NETWORK_ID;
+      const netId = connectionStatus.networkId ?? network.networkId;
 
       setState({
         status: 'connected',
@@ -136,7 +137,7 @@ export const WalletProvider: React.FC<PropsWithChildren> = ({ children }) => {
       }));
       connectedAPIRef.current = null;
     }
-  }, []);
+  }, [network]);
 
   const connect = useCallback(async () => {
     setState((s) => ({ ...s, status: 'detecting', errorMessage: null }));

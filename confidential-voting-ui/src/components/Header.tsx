@@ -15,6 +15,7 @@ import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import { useWallet } from '../contexts/WalletContext';
+import { NetworkSwitcher } from './NetworkSwitcher';
 
 export type HeaderProps = {
   onJoinContract?: (contractAddress: string) => void;
@@ -139,6 +140,9 @@ export const Header: React.FC<HeaderProps> = ({ onJoinContract, onDeployContract
               Join
             </Button>
           </Box>
+
+          {/* Network Switcher */}
+          <NetworkSwitcher />
 
           {/* Wallet Connect Button */}
           <Tooltip
