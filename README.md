@@ -4,27 +4,28 @@
 
 > Privacy-preserving decentralized voting on the Midnight Network — anonymous ballots, publicly verifiable tallies.
 
-## Live Demo
+---
 
-[https://midnight-inky-seven.vercel.app](https://midnight-inky-seven.vercel.app)
+## Links
 
-## Screenshots
+| Resource | URL |
+|----------|-----|
+| **Live Demo** | [https://midnight-inky-seven.vercel.app](https://midnight-inky-seven.vercel.app) |
+| **Demo Video (Level 3)** | [Google Drive](https://drive.google.com/file/d/1OYz6lcS2IM5KII8M6sgrBS0Rdy-u0-Dq/view?usp=sharing) |
+| **Demo Video (Level 1)** | [Google Drive](https://drive.google.com/file/d/1Sy_zU8ESOT0saMXSukYuzGUrdcdXZ_-z/view?usp=sharing) |
+| **GitHub Repository** | [github.com/Boredooms/midnight](https://github.com/Boredooms/midnight) |
+| **Midnight Docs** | [docs.midnight.network](https://docs.midnight.network) |
 
-| Page | Preview |
-|------|---------|
-| Landing | ![Landing](docs/screenshots/landing.png) |
-| Features | ![Features](docs/screenshots/features.png) |
-| Architecture | ![Architecture](docs/screenshots/Architechture.png) |
-| Demo | ![Demo](docs/screenshots/Demo.png) |
-| Main dApp | ![App](docs/screenshots/main%20dapp.png) |
-| Test Suite | ![Tests](docs/screenshots/test_suite.png) |
-| Tests Passing | ![Terminal](docs/screenshots/tests_passing.png) |
+---
 
-## Contract Address
+## Contract Addresses
 
-| Network | Address |
-|---------|---------|
-| Preview | [`79bda166f07754080384f07744c742033cabff15f3ba428433e25d413cf2bb8b`](https://preview.midnightexplorer.com/contracts/0x79bda166f07754080384f07744c742033cabff15f3ba428433e25d413cf2bb8b) |
+| Network | Address | Explorer |
+|---------|---------|----------|
+| **Preview** | `79bda166f07754080384f07744c742033cabff15f3ba428433e25d413cf2bb8b` | [View on Explorer](https://preview.midnightexplorer.com/contracts/0x79bda166f07754080384f07744c742033cabff15f3ba428433e25d413cf2bb8b) |
+| **Preprod** | `ff4960ad66c533fc03ae116d182f2ca9782f149fa3d025eaeaffe23594c30942` | [View on Explorer](https://preprod.midnightexplorer.com/contracts/0xff4960ad66c533fc03ae116d182f2ca9782f149fa3d025eaeaffe23594c30942) |
+
+---
 
 ## What This Does
 
@@ -34,6 +35,8 @@ A confidential voting DApp where:
 - Nullifiers prevent double-voting without linking to voter identity
 - Anyone can finalize the election after the deadline (decentralized — no owner needed)
 - Final tallies and winner are published on-chain transparently
+
+---
 
 ## Privacy Model
 
@@ -54,17 +57,67 @@ A confidential voting DApp where:
 - The voter's secret key (never leaves their local machine)
 - Any connection between a voter's identity across different elections (public keys are election-specific via `persistentHash`)
 
+---
+
+## Screenshots
+
+| Page | Preview |
+|------|---------|
+| Landing | ![Landing](docs/screenshots/landing.png) |
+| Features | ![Features](docs/screenshots/features.png) |
+| Architecture | ![Architecture](docs/screenshots/Architechture.png) |
+| Demo | ![Demo](docs/screenshots/Demo.png) |
+| Main dApp | ![App](docs/screenshots/main%20dapp.png) |
+| Test Suite | ![Tests](docs/screenshots/test_suite.png) |
+| Tests Passing | ![Terminal](docs/screenshots/tests_passing.png) |
+
+---
+
+## Level Requirements — Completion Status
+
+### Level 1 — Functional DApp
+
+| Requirement | Status | Evidence |
+|-------------|--------|----------|
+| Lace wallet connect/disconnect | ✅ | DApp Connector API v4, supports Lace + 1AM |
+| Circuit called from frontend | ✅ | `createElection`, `vote`, `finalizeElection`, `ownerFinalizeElection` |
+| Observable privacy behavior | ✅ | Vote choice proven valid without being revealed (ZK nullifier) |
+| Contract deployed to Preprod | ✅ | `ff4960ad...c30942` on Preprod |
+| Minimum 8 meaningful commits | ✅ | 12+ commits |
+
+### Level 3 — Production-Grade DApp
+
+| Requirement | Status | Evidence |
+|-------------|--------|----------|
+| Fully functional dApp using Midnight privacy | ✅ | Confidential voting with ZK proofs |
+| Minimum 3 tests passing | ✅ | **20 tests passing** (circuit, state, privacy, access control) |
+| CI/CD pipeline running | ✅ | GitHub Actions — compile, test, build on every push |
+| Approved idea from provided list | ✅ | **Private Voting** — anonymous ballots with publicly verifiable tallies |
+| Minimum 10 meaningful commits | ✅ | 12+ meaningful commits |
+| Public GitHub repo with README | ✅ | [github.com/Boredooms/midnight](https://github.com/Boredooms/midnight) |
+| Live demo link | ✅ | [midnight-inky-seven.vercel.app](https://midnight-inky-seven.vercel.app) |
+| Screenshot: test output (3+ passing) | ✅ | 20 tests — see `docs/screenshots/tests_passing.png` |
+| CI badge or workflow with passing runs | ✅ | Badge at top of README |
+| Demo video (1 min) | ✅ | [Google Drive link](https://drive.google.com/file/d/1OYz6lcS2IM5KII8M6sgrBS0Rdy-u0-Dq/view?usp=sharing) |
+| README "privacy model" section | ✅ | See above — what observer can/cannot learn |
+| Product proposal (PROPOSAL.md) | ✅ | See [PROPOSAL.md](./PROPOSAL.md) |
+| Contract address in README | ✅ | Preview: `79bda166...` / Preprod: `ff4960ad...` |
+
+---
+
 ## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Smart Contract | Compact 0.23 (Midnight's ZK DSL) |
-| Frontend | React 19, MUI 9, Framer Motion, Three.js, GSAP |
+| Smart Contract | Compact 0.23 (Midnight ZK DSL) |
+| Frontend | React 19, MUI 9, Framer Motion, GSAP, WebGL shader |
 | Blockchain SDK | Midnight.js 4.1.1, DApp Connector API v4 |
 | Proof Server | `midnightntwrk/proof-server:8.1.0` (Docker) |
 | Testing | Vitest 4.x, compact-runtime simulator |
 | CI/CD | GitHub Actions |
 | Deploy | Vercel |
+
+---
 
 ## Prerequisites
 
@@ -90,9 +143,6 @@ docker compose up -d
 # Run the frontend (preview network)
 npm run dev:preview
 # Opens at http://localhost:5173
-
-# Or for local dev (requires midnight-local-dev running):
-npm run dev:local
 ```
 
 ### Wallet Setup (Preview Network)
@@ -101,7 +151,9 @@ npm run dev:local
 2. Switch to **Preview** network in Lace settings
 3. Fund wallet from [Preview faucet](https://midnight-tmnight-preview.nethermind.dev/)
 4. Register for DUST generation
-5. Connect wallet in the DApp and interact with the election
+5. Connect wallet in the dApp and interact with elections
+
+---
 
 ## Run Tests
 
@@ -117,16 +169,21 @@ npx vitest run
 - Double-vote prevention
 - Access control (owner-only emergency finalize)
 
+---
+
 ## CI/CD
 
 The GitHub Actions pipeline (`.github/workflows/ci.yaml`) runs on every push to `main` and on pull requests:
 
-1. **Contract job:** Compile Compact → typecheck → lint → build → run 20 unit tests
-2. **API job:** Build the TypeScript API layer
-3. **UI job:** Typecheck + production build of the React frontend
-4. **CLI job:** Build the deployment CLI
+1. Compile Compact contract (v0.31.1)
+2. Typecheck + lint contract
+3. Build contract
+4. **Run 20 unit tests**
+5. Build API layer
+6. Build CLI
+7. Typecheck UI
 
-All jobs run in parallel where possible (API, UI, CLI depend on contract artifacts).
+---
 
 ## Project Structure
 
@@ -139,17 +196,22 @@ All jobs run in parallel where possible (API, UI, CLI depend on contract artifac
 ├── confidential-voting-ui/           # React frontend
 │   ├── src/config/networks.ts        # Multi-network config
 │   ├── src/contexts/                 # Wallet + Voting + Network contexts
-│   ├── src/components/NetworkSwitcher.tsx
+│   ├── src/components/               # DashboardLayout, PillNav, ShaderBg
 │   ├── docker-compose.yml            # Proof server
 │   └── public/keys/ & zkir/          # ZK proving artifacts
 ├── .github/workflows/ci.yaml         # CI/CD pipeline
 ├── PROPOSAL.md                       # Product proposal
+├── SUMMARY.md                        # Demo video script guide
 └── README.md
 ```
 
+---
+
 ## Product Proposal
 
-See [PROPOSAL.md](./PROPOSAL.md)
+See [PROPOSAL.md](./PROPOSAL.md) — Private Voting from the approved idea list.
+
+---
 
 ## License
 
