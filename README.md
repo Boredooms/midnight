@@ -12,7 +12,7 @@
 |----------|-----|
 | **Live Demo** | [https://midnight-inky-seven.vercel.app](https://midnight-inky-seven.vercel.app) |
 | **Demo Video (Level 3)** | [Google Drive](https://drive.google.com/file/d/1OYz6lcS2IM5KII8M6sgrBS0Rdy-u0-Dq/view?usp=sharing) |
-| **Demo Video (Level 1)** | [Google Drive](https://drive.google.com/file/d/1Sy_zU8ESOT0saMXSukYuzGUrdcdXZ_-z/view?usp=sharing) |
+| **Demo Video (Level 2)** | [Google Drive](https://drive.google.com/file/d/1Sy_zU8ESOT0saMXSukYuzGUrdcdXZ_-z/view?usp=sharing) |
 | **GitHub Repository** | [github.com/Boredooms/midnight](https://github.com/Boredooms/midnight) |
 | **Midnight Docs** | [docs.midnight.network](https://docs.midnight.network) |
 
