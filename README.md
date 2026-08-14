@@ -73,9 +73,9 @@ A confidential voting DApp where:
 
 ---
 
-## Level Requirements — Completion Status
+## Level 2 Requirements — Completion Status
 
-### Level 1 — Functional DApp
+### Level 2 — Enhanced DApp
 
 | Requirement | Status | Evidence |
 |-------------|--------|----------|
@@ -83,6 +83,7 @@ A confidential voting DApp where:
 | Circuit called from frontend | ✅ | `createElection`, `vote`, `finalizeElection`, `ownerFinalizeElection` |
 | Observable privacy behavior | ✅ | Vote choice proven valid without being revealed (ZK nullifier) |
 | Contract deployed to Preprod | ✅ | `ff4960ad...c30942` on Preprod |
+| Contract deployed to Preview | ✅ | `79bda166...cf2bb8b` on Preview |
 | Minimum 8 meaningful commits | ✅ | 12+ commits |
 
 ### Level 3 — Production-Grade DApp
